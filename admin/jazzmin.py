@@ -40,10 +40,8 @@ JAZZMIN_SETTINGS = {
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
 
         # external url that opens in a new window (Permissions can be added)
-         
-       
-        {"name": "Check Clothes", "url": 'checkproducts/', "new_window": True},
-        {"name": "Calendar", "url":'calendar/', "new_window": True},
+        {"name": "Check Clothes", "url": "http://103.176.22.191/checkproducts/", "new_window": True},
+        {"name": "Calendar", "url":"http://103.176.22.191/calendar/", "new_window": True},
 
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
