@@ -1,0 +1,15 @@
+{% extends 'event_calendar/base.html' %}
+
+{% block title %}
+Calendar
+{% endblock %}
+
+{% block content %}
+<div class="clearfix">
+	<a class="btn btn-info left" href="{% url 'event_calendar:calendar' %}?{{ prev_month }}"> Tháng trước </a>
+	<a class="btn btn-info right" href="{% url 'event_calendar:calendar' %}?{{ next_month }}"> Tháng sau </a>
+	<a class="btn btn-info right" href="{% url 'event_calendar:event_new' %}"> Thêm sự kiện </a>
+</div>
+
+{{ calendar }}
+{% endblock %}

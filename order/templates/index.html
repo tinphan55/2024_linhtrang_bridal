@@ -1,0 +1,58 @@
+{% extends "master.html" %}
+
+{% block title %}
+  Danh sách sản phẩm cho thuê
+
+{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Document</title>
+</head>
+<body>
+    <form method="GET" action="{% url 'index' %}">
+        {{ form.as_p }}
+        <input type = "submit" value="Submit" class="btn btn-primary">
+    </form>
+    <hr/>
+    <h1 class="duy"> Danh sách trang phục cho thuê</h1>
+    
+    <table class = "table" style="border: 1px solid black;">
+        <thead>
+        <tr>
+            <th style="border: 1px solid black;">Mã Code</th>
+            <th style="border: 1px solid black;">Tên</th>
+            <th style="border: 1px solid black;">Màu </th>
+            <th style="border: 1px solid black;">Đơn hàng</th>
+            <th style="border: 1px solid black;">Ngày cho thuê</th>
+            <th style="border: 1px solid black;">Ngày hẹn trả đồ</th>
+            <th style="border: 1px solid black;">Đã trả đồ </th>
+    
+        </tr>
+        </thead>
+        <tbody>
+            {% for x in clothes  %}
+                <tr>
+                    <td style="border: 1px solid black;">{{ x.clothe.code}}</td>
+                    <td style="border: 1px solid black;">{{ x.clothe.name}}</td>
+                    <td style="border: 1px solid black;">{{ x.clothe.color}}</td>
+                    <td style="border: 1px solid black;">{{ x.cart}}</td>
+                    <td style="border: 1px solid black;">{{ x.delivery_date|date:'d-m-Y' }}</td>
+                    <td style="border: 1px solid black;">  {{ x.return_date|date:'d-m-Y' }}</td>
+                    <td style="border: 1px solid black;">{{ x.is_returned}}</td>
+            {% endfor %}
+        <tbody>
+    </table>
+    
+    
+    {% endblock %}
+</body>
+</html>
+
