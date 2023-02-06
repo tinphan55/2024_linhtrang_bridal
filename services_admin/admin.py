@@ -64,6 +64,9 @@ class AccessoryAdmin(admin.ModelAdmin):
     readonly_fields =('category',)
     actions = [not_available]
 
+class RankingAdmin(admin.ModelAdmin):
+    list_display = ('id','rank','price', 'category', 'description')
+    search_fields = ('rank',)
 
 #admin.site.register(ComboItem)
 admin.site.register(Accessory, AccessoryAdmin)
@@ -72,4 +75,4 @@ admin.site.register(Clothe, ClotheAdmin)
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag)
-admin.site.register(Ranking)
+admin.site.register(Ranking,RankingAdmin )
