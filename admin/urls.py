@@ -20,5 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('order.urls')),
     path('', include('event_calendar.urls')),
+    path('', include('frontend.urls')),
     
 ]
