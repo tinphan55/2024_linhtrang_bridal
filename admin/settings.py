@@ -28,7 +28,7 @@ DEBUG = True
 
 
 
-ALLOWED_HOSTS = ['*'] 
+ALLOWED_HOSTS = [] 
 
 
 # Application definition
@@ -84,17 +84,29 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
+DATABASES_LIST = [{
+#server
+      'default': {
+         'ENGINE': 'django.db.backends.postgresql',
+         'NAME': 'bridal',                      
+         'USER': 'huytruong',
+         'PASSWORD': 'Linhtr@ng2023',
+         'HOST': 'localhost',
+         'PORT': '',
+     }
+ }, 
+#localhost
+{
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bridal',                      
-        'USER': 'huytruong',
-        'PASSWORD': 'Linhtr@ng2023',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'backup_bridal',                      
+        'USER': 'postgres',
+        'PASSWORD': 'Ecotr@ding2021',
+        'HOST': '',
+        'PORT': '5432',
     }
-}
-
+}]
+DATABASES = DATABASES_LIST[1]
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
