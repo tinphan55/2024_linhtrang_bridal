@@ -15,15 +15,18 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
+    
 class Ranking (models.Model):
     rank = models.CharField(max_length=10)
     category = models.ForeignKey(Category, on_delete=models.CASCADE) 
+    type = models.CharField(max_length=20)
     description = models.CharField(max_length= 100, null=True, blank=True)
-    price = models.IntegerField()
-
+    price = models.IntegerField(default=0)
+    
     
     def __str__(self):
-        return str(self.category) +'_' + str(self.rank)
+        return str(self.category) +'_' + str(self.type)+ '_' +str(self.rank)
 
 class ItemBase (models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -63,14 +66,23 @@ class Clothe(ItemBase):
 
 class Photo(ItemBase):  
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=2)
+    number_gate_photo = models.IntegerField()
+    is_album=  models.BooleanField(default=False) 
+    number_location = models.IntegerField()
+    small_photo = models.IntegerField()
+    origin_file = models.IntegerField()
+    edit_file = models.IntegerField()
     price = models.IntegerField()
+
     def __str__(self):
         return self.name
+
     
 
 class Makeup(ItemBase):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=3)
     price = models.IntegerField()
+    re_makup = models.BooleanField(default=False)
     def __str__(self):
         return self.name
     
@@ -93,19 +105,4 @@ class Tag (models.Model):
     name = models.CharField(max_length=50)
     def __str__(self):
         return f"{self.name}"
-
-class ComboItem(models.Model):
-    name = models.TextField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    ranking = models.ForeignKey(Ranking,on_delete=models.CASCADE, blank=True, null=True )
-    number_items = models.IntegerField(null=False, blank=False)
-    discount = models.FloatField(default=0)
-    created_date = models.DateTimeField(auto_now_add=True)
-    modified_date = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField('Tag', blank=True, null=True)
-    description = models.TextField(max_length=500, blank=True)
-
-
-    
-
 
