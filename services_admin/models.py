@@ -20,7 +20,7 @@ class Category(models.Model):
 class Ranking (models.Model):
     rank = models.CharField(max_length=10)
     category = models.ForeignKey(Category, on_delete=models.CASCADE) 
-    type = models.CharField(max_length=20)
+    type = models.CharField(max_length=20, null=True, blank=True)
     description = models.CharField(max_length= 100, null=True, blank=True)
     price = models.IntegerField(default=0)
     

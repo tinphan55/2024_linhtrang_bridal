@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from .models import *
 from import_export.admin import ImportExportModelAdmin
 from .resources import ProductResource
-from .admin_combo import *
-from .form import *
+
+
 
 
 class CategoryAdmin(admin.ModelAdmin):
