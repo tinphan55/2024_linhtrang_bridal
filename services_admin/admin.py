@@ -40,7 +40,7 @@ class PhotoAdmin(admin.ModelAdmin):
         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=2)
         return form 
     list_display = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file', 'is_album','price', 'is_available')
-    fields = ('name','ranking','number_location','number_gate_photo','origin_file','edit_file','is_album','price', 'is_available','description' ,'tags')
+    fields = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file','is_album','price', 'is_available','description' ,'tags')
     list_display_links = ('name',)
     search_fields = ('name','ranking')
     readonly_fields =('category',)
