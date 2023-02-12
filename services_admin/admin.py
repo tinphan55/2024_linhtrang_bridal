@@ -26,7 +26,7 @@ class ClotheAdminView(admin.ModelAdmin):
     list_display = ('code','name','ranking','qty','price', 'is_available','color')
     fields = ('code','name','ranking','qty', 'is_available','color','description','tags', 'images' )
     list_display_links = ('name',)
-    search_fields = ('name','ranking', )
+    search_fields = ('code', )
     readonly_fields =('category','price')
     actions = [not_available]
 
@@ -42,7 +42,7 @@ class PhotoAdmin(admin.ModelAdmin):
     list_display = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file', 'is_album','price', 'is_available')
     fields = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file','is_album','price', 'is_available','description' ,'tags')
     list_display_links = ('name',)
-    search_fields = ('name','ranking')
+    search_fields = ('name',)
     readonly_fields =('category',)
     actions = [not_available]
 
@@ -54,7 +54,7 @@ class MakeupAdmin(admin.ModelAdmin):
     list_display = ('name','ranking','re_makup','price', 'is_available')
     fields = ('name','ranking','re_makup','price', 'is_available','description', 'tags' )
     list_display_links = ('name',)
-    search_fields = ('name','ranking')
+    search_fields = ('name',)
     readonly_fields =('category',)
     actions = [not_available]
 

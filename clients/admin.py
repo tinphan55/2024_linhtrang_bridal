@@ -13,9 +13,9 @@ def total_client_cart(obj):
 
 class ClientAdmin (admin.ModelAdmin):
     model = Client
-    list_display=('first_name', 'last_name', 'phone','total_cart_')
-    field =['first_name', 'last_name', 'phone','address','birthday','total_cart_']
-    search_fields = ('first_name', 'last_name', 'phone')
+    list_display=('full_name', 'code', 'phone','total_cart_')
+    field =['full_name', 'code', 'phone','address','birthday','total_cart_']
+    search_fields = ('full_name', 'code', 'phone')
     readonly_fields= ['total_cart_']
 
     @admin.display(description='total_cart_')

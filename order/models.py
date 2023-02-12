@@ -13,11 +13,19 @@ from django.conf import settings
 
 
 
+
+# def get_combo_choices():
+#         combo_choices = [(c.id, c.name) for c in ComboPhoto.objects.all()]
+#         combo_choices.insert(0, ("0", "None"))
+#         return combo_choices
+
+
 class Cart(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=datetime.now)
     wedding_date= models.DateField(null=False, blank= False)
+    # combo = models.IntegerField(choices=get_combo_choices(), default="0", blank=True, null=True)
     note = models.TextField(max_length=500, null= True, blank=True)
     incurred = models.IntegerField(null= True, blank=True, default=0)
     total_price = models.FloatField(default=0)
@@ -31,13 +39,6 @@ class Cart(models.Model):
     
     def return_id_cart(self):
         return self.id
-    
-    def my_view(self,request, *args, **kwargs):
-        username = None
-        if request.user.is_authenticated():
-            self.user = request.user.username
-        super(Cart,self).save(*args, **kwargs)
-    
 
         
     def save(self, *args, **kwargs):
@@ -89,9 +90,10 @@ class Cart(models.Model):
 class CartItems(models.Model):
     class Meta:
         abstract = True
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)    
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
     price = models.FloatField(blank=True, default=0)
     qty = models.IntegerField(default=1)
+    discount = models.IntegerField(null= True, blank=True, default=0)  
     total_items = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -105,24 +107,27 @@ class CartItems(models.Model):
 class ClotheService(CartItems):
     clothe = models.ForeignKey(Clothe, on_delete = models.CASCADE,
      limit_choices_to={'is_available': True})
-    delivery_date = models.DateField()
-    return_date = models.DateField()
-    is_returned = models.BooleanField(default=True) 
+    delivery_date = models.DateField(null= True, blank=True)
+    return_date = models.DateField(null= True, blank=True)
+    is_returned = models.BooleanField(default=False) 
     returned_at = models.DateTimeField(null=True, blank=True)  
     note = models.TextField(max_length=500, null = True, blank=True)
     noti = models.CharField (max_length=200)
+    
     def __str__(self):
         return str(self.clothe)
     
     def save(self, *args, **kwargs):
         self.price = Clothe.objects.get(id=self.clothe_id).price
-        self.delivery_date = self.cart.wedding_date - timedelta(days=2)
-        self.return_date = self.cart.wedding_date + timedelta(days=2) 
+        if self.delivery_date == None:
+            self.delivery_date = self.cart.wedding_date - timedelta(days=2)
+        if self.return_date == None:
+            self.return_date = self.cart.wedding_date + timedelta(days=2) 
         today = date.today()
         if today > self.delivery_date and self.returned_at == None:
             self.is_returned = False
         if self.is_returned == False and today > self.return_date:
-            self.noti = str('Thu hoi do cuoi, da tre hen. Ngay thu hoi theo hen la') + str(self.return_date)
+            self.noti = str('Thu hồi đồ cưới, đã trễ hẹn. Ngày thu hồi') + str(self.return_date)
         super(ClotheService, self).save(*args, **kwargs)
 
 class PhotoService(CartItems):
@@ -175,10 +180,13 @@ class ReturnItems (ClotheService):
     class Meta:
         proxy = True
     
-
-
     def __str__(self):
         return str(self.clothe.name)
 
-
-    
+# class CartCombo (models.Model):
+#     name = models.CharField(max_length=100)
+#     clothe = models.ManyToManyField(Clothe)
+#     def save_model(self, request, form):
+#         if form.is_valid():
+#             self.name.save()
+#             self.clothe.save_m2m()
