@@ -122,11 +122,11 @@ def total_discount_raw(obj):
     cart = list(chain(clothe_items, photo_items,makeup_items,accessory_items  ))
     total_discount = 0
     for items in cart:
-	if items['discount'] == None:
-       		items['discount'] = 0
-           	total_discount = total_discount + items['discount']
+        if items['discount'] == None:
+                items['discount'] = 0
+                total_discount = total_discount + items['discount']
         else:
-           	total_discount = total_discount + items['discount']
+                total_discount = total_discount + items['discount']
     return total_discount
 
 def total_incurred_raw(obj):
