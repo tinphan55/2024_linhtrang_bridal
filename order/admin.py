@@ -37,7 +37,7 @@ class ReturnItemsAdmin(admin.ModelAdmin):
     def clothe_id(self, obj):
         return obj.clothe.id
     model = ReturnItems
-    list_display = ('cart','clothe','get_color','qty', 'delivery_date', 'return_date', 'is_returned', 'returned_at' )
+    list_display = ('cart','clothe','get_color','qty' ,'delivery_date', 'return_date', 'is_returned', 'returned_at' )
     fields = ['clothe','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
     readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','returned_at', 'noti']
     list_display_links = ('clothe',)
@@ -157,9 +157,9 @@ def receivable_row(obj):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','user','client','created_at','wedding_date', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_')
+    list_display=('user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
     fields = ['user','client','wedding_date','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_']
-    list_display_links=('client','id')
+    list_display_links=('client',)
     search_fields=('client__code',)
      #['created_at','wedding_date',]
     readonly_fields = [ 'created_at','total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_']

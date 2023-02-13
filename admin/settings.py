@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-from .jazzmin import JAZZMIN_SETTINGS
+from .jazzmin import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -99,7 +99,7 @@ DATABASES_LIST = [{
 {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'backup_bridal',                      
+        'NAME': 'Bridal_develop',                      
         'USER': 'postgres',
         'PASSWORD': 'Ecotr@ding2021',
         'HOST': '',
@@ -131,11 +131,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_L10N = False
+
+USE_TZ = False
+
+DATE_FORMAT = ( ( 'd-m-Y' ))
+DATE_INPUT_FORMATS = ( ('%d-%m-%Y'),)
+DATETIME_FORMAT = (( 'd-m-Y H:i' ))
+DATETIME_INPUT_FORMATS = (('%d-%m-%Y %H:%i'),)
 
 
 # Static files (CSS, JavaScript, Images)
@@ -149,3 +156,4 @@ STATIC_ROOT = Path.joinpath(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
+JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
