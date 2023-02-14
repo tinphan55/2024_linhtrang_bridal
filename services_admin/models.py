@@ -88,6 +88,7 @@ class Makeup(ItemBase):
     
 class Accessory(models.Model):
     name = models.CharField(max_length=50)
+    ranking = models.ForeignKey(Ranking,on_delete=models.CASCADE, blank=True, null=True )
     qty = models.IntegerField(null=False)
     description = models.TextField(max_length=500, blank=True)
     price = models.IntegerField(default=0)
@@ -99,6 +100,10 @@ class Accessory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.price = Ranking.objects.get(id=self.ranking_id).price
+        super(Accessory, self).save(*args, **kwargs)
 
 
 class Tag (models.Model):

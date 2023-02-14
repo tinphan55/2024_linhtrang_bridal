@@ -59,8 +59,12 @@ class MakeupAdmin(admin.ModelAdmin):
     actions = [not_available]
 
 class AccessoryAdmin(admin.ModelAdmin):
-    list_display = ('id','name','qty','price', 'is_available')
-    fields = ('name','qty', 'is_available','price','description' , 'tags')
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(AccessoryAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['ranking'].queryset = Ranking.objects.filter(category=4)
+        return form 
+    list_display = ('id','name','ranking','price','qty', 'is_available')
+    fields = ('name','ranking','qty', 'is_available','description' , 'tags')
     list_display_links = ('name',)
     search_fields = ('name',)
     readonly_fields =('category',)
