@@ -101,9 +101,7 @@ class Accessory(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        self.price = Ranking.objects.get(id=self.ranking_id).price
-        super(Accessory, self).save(*args, **kwargs)
+
 
 
 class Tag (models.Model):

@@ -64,7 +64,7 @@ class AccessoryAdmin(admin.ModelAdmin):
         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=4)
         return form 
     list_display = ('id','name','ranking','price','qty', 'is_available')
-    fields = ('name','ranking','qty', 'is_available','description' , 'tags')
+    fields = ('name','ranking','qty','price', 'is_available','description' , 'tags')
     list_display_links = ('name',)
     search_fields = ('name',)
     readonly_fields =('category',)
