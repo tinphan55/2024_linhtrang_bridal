@@ -145,7 +145,7 @@ JAZZMIN_SETTINGS = {
     "changeform_format": "horizontal_tabs",
     # override change forms on a per modeladmin basis
     "changeform_format_overrides": 
-    {"auth.user": "collapsible", "order.Cart": "vertical_tabs"},
+    {"auth.user": "collapsible", "order.Cart": "vertical_tabs", "bills.Bill":"single"},
 
 
    

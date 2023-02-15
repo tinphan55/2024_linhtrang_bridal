@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'order',
     'import_export',
     'event_calendar.apps.CalConfig', 
-    'frontend'
+    'frontend',
+    'bills' 
+  
 ]
 
 MIDDLEWARE = [
