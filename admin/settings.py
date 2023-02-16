@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'import_export',
     'event_calendar.apps.CalConfig', 
     'frontend',
-    'bills' 
+    'bills', 
+  
   
 ]
 

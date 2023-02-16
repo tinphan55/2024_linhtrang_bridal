@@ -12,22 +12,37 @@ class BillItemsInline(admin.TabularInline):
     
 
 class BillAdmin(admin.ModelAdmin):
-    fields = ('code','note')
-    list_display = ('id','client_full_name','created_date','client_phone','title_with_link')
-    list_display_links = ('client_full_name',)
+    inlines = [BillItemsInline]
+    list_display = ('id','created_date','client_full_name','client_phone','title_with_link')
+    fields = ('note',)
+    list_display_links = ('id',)
     search_fields = ('client_phone',)
     list_filter = ('created_date',)
-    inlines = [BillItemsInline]
-    
+
     def title_with_link(self, obj):
-        url = reverse('bills:typebills', args=[obj.pk])
-        return format_html("<a href='{}' target='_blank'>{}</a>", url, obj.code)
+        first_item = obj.billitems_set.first()
+        if first_item is None:
+            return "None" 
+        else:
+            url = reverse('bills:details', args=[obj.pk])
+            return format_html("<a href='{}' target='_blank'>{}</a>", url, obj.code)
     title_with_link.short_description = 'Link_Bill'
+  
+
 
     def client_full_name(self, obj):
-        return obj.billitems_set.first().cart.client.full_name
+        first_item = obj.billitems_set.first()
+        if first_item is None:
+            return "None" 
+        else:
+            return first_item.cart.client.full_name
+    
     def client_phone(self, obj):
-        return obj.billitems_set.first().cart.client.phone
+        first_item = obj.billitems_set.first()
+        if first_item is None:
+            return "None" 
+        else:
+            return obj.billitems_set.first().cart.client.phone
 
     client_full_name.short_description = 'Client'
     client_phone.short_description = 'Phone'

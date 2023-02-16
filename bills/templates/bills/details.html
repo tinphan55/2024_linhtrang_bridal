@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ bills.code }}</title>
+    <link rel="stylesheet" href="{%static 'bills/css/style.css' %}" media="all" /> 
+
+  </head>
+  <body>
+    <header class="clearfix">
+      <div id="logo">
+        <img src="{% static 'bills/img/logo.png'%}" style="width: 254px; height:116px"> 
+      </div>
+      <div id="company">
+        <h1 class="name">HỢP ĐỒNG DỊCH VỤ CƯỚI</h1>
+        <div>Số 9, Hẻm số 9, Long Thành Bắc, Hòa Thành Tây Ninh</div>
+        <div>0853.933.046</div>
+        <div><a href="mailto:{{company.email}}">{{company.email}}</a></div>
+      </div>
+    </header>
+    <main>
+      <div id="details" class="clearfix">
+        <div id="client">
+          <div class="to">KHÁCH HÀNG:</div>
+          <h2 class="name">{{ cart.client.full_name }}</h2>
+          <div class="address">{{ cart.client.address }}</div>
+          <div class="email"><a href="mailto:{{ customer_email }}">{{ customer_email }}</a></div>
+        </div>
+        <div id="invoice">
+          <h1>#{{ bills.code }}</h1>
+          <div class="date">Ngày tạo: {{ bills.created_at }}</div>
+          <div class="date">Ngày cưới: {{ cart.wedding_date }}</div>
+        </div>
+      </div>
+      
+      {% if items.clothe_bill %}
+        <table border="0" cellspacing="0" cellpadding="0">
+          <h4>Cho thuê Áo cưới, ngày giao {{ first_clothe.delivery_date }}
+            , ngày trả {{ first_clothe.return_date }}
+          </h4>
+          <thead>
+            <tr>
+              <th class="no">#</th>
+              <th class="desc">DỊCH VỤ</th>
+              <th class="unit">GIÁ BÁN LẺ</th>
+              <th class="qty">SỐ LƯỢNG</th>
+              <th class="total">GIẢM GIÁ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for clothe in items.clothe_bill %}
+              {% if clothe %}
+                {% for item in clothe %}
+                  <tr>
+                    <td class="no">{{ forloop.parentloop.counter }}</td>
+                    <td class="desc">{{ item.clothe.code }}, {{ item.clothe.name }}</td>
+                    <td class="unit">{{ item.price }}</td>
+                    <td class="qty">{{ item.qty }}</td>
+                    <td class="total">{{ item.discount }}</td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </tbody>
+      {% endif %}
+
+      {% if items.makup_bill %}
+        <table border="0" cellspacing="0" cellpadding="0">
+          <h4>Trang điểm cô dâu, bắt đầu đãi {{date_makup.start_time}} , kết thúc lúc {{date_makup.end_time}} </h4>
+          <thead>
+            <tr>
+              <th class="no">#</th>
+              <th class="desc">DỊCH VỤ</th>
+              <th class="unit">GIÁ BÁN LẺ</th>
+              <th class="qty">SỐ LƯỢNG</th>
+              <th class="total">GIẢM GIÁ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for makeup in items.makup_bill %}
+              {% if makeup %}
+                {% for item in makeup %}
+                  <tr>
+                    <td class="no">{{ forloop.parentloop.counter }}</td>
+                    <td class="desc">{{ item.package.name }}, Gói {% if item.package.re_makup %} có {% else %} không {% endif %} bao gồm dặm lại</td>
+                    <td class="unit">{{ item.price }}</td>
+                    <td class="qty">{{ item.qty }}</td>
+                    <td class="total">{{ item.discount }}</td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            
+          </tbody>
+          
+      {% endif %}
+      
+      {% if items.photo_bill %}
+        <table border="0" cellspacing="0" cellpadding="0">
+          <h4>Chụp hình cưới, ngày chụp hình {{date_photo.start_time}} </h4>
+          <thead>
+            <tr>
+              <th class="no">#</th>
+              <th class="desc">DỊCH VỤ</th>
+              <th class="unit">GIÁ BÁN LẺ</th>
+              <th class="qty">SỐ LƯỢNG</th>
+              <th class="total">GIẢM GIÁ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for photo in items.photo_bill %}
+              {% if photo %}
+                {% for item in photo %}
+                  <tr>
+                    <td class="no">{{ forloop.parentloop.counter }}</td>
+                    <td class="desc">Có {{ item.package.number_location }} điểm chụp, {{ item.package.number_gate_photo }} hình cổng
+                      {{ item.package.number_small_photo }} hình nhỏ, {{ item.package.origin_file }} file gốc,  {{ item.package.edit_file }} file chỉnh sửa, 
+                      {% if item.package.is_album %} và có album {% else %} và không có album {% endif %} </td>
+                    <td class="unit">{{ item.price }}</td>
+                    <td class="qty">{{ item.qty }}</td>
+                    <td class="total">{{ item.discount }}</td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            
+          </tbody>
+          
+      {% endif %}
+      
+
+        <tfoot>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="2">TỔNG GIÁ BÁN LẺ</td>
+            <td> {{total_retail}}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="2">GIẢM GIÁ</td>
+            <td>{{discount}}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="2">PHÁT SINH</td>
+            <td>{{incurred}}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="2">TỔNG TIỀN THANH TOÁN</td>
+            <td>{{total}}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="2">ĐÃ TRẢ</td>
+            <td>{{paid}}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="2">CÒN LẠI</td>
+            <td>{{receivable}}</td>
+          </tr>
+          
+        </tfoot>
+      
+      </table>
+      
+      <table border="0" cellspacing="0" cellpadding="0"></tableborder>
+        <tr>
+          <th class="cus"><h4>Khách hàng</h4></th>
+          <th class="staff"><h4>Nhân viên</h4></th>
+          <th class="contact"><h4>SĐT-Zalo hỗ trợ</h4></th>
+        </tr>
+        <tr>
+
+        <td class="cus" style="text-align: center;"></td>
+        <td class="staff" style="text-align: center;"></td>
+        <td class="contact" style="text-align: center;">{{staff.lastname}} - {{staff.phone}}</td>
+        </tr>
+        <tr>
+
+          <td class="cus" style="text-align: center;">{{cart.client.full_name}}</td>
+          <td class="staff" style="text-align: center;">{{staff.firstname}} {{staff.lastname}}</td>
+          <td class="contact" style="text-align: center;"></td>
+          </tr>
+     
+      </table>
+
+      <div id="note">Ghi chú: {{bills.note}} </div>
+      <div id="thanks">Cám ơn Quý khách sử dụng dịch vụ</div>
+      <div id="notices">
+        <div>LƯU Ý:</div>
+        <div class="notice">Chân hình trưng bài hình cổng LT hổ trợ cho khách thuê đồ + chụp hình  miễn phí 
+          Khách hàng tự ý HỦY HỢP ĐỒNG sẽ không nhận lại được cọc . 
+          Trang phục khách thuê giữ cẩn thận : nếu rách , bẩn nặng không xử lý được phải đền bù 
+          Khách thuê đồ trả đúng hẹn nếu trễ ngày tính phụ thử 10% giá trị hợp đồng thuê . 
+          Lưu ý khách đã kí hợp đồng muốn thây đổi trang phục khác vui lòng báo trước 2 ngày kể từ ngày kí hợp đồng để được đổi với giá giảm .Sau 3 ngày kể từ ngày kí hợp đồng trở lên trang phục khách muốn  thay đổi sẽ được tính giá lẻ</div>
+      </div>
+    </main>
+   
+  </body>
+</html>

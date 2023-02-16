@@ -3,11 +3,15 @@ from django.http import HttpResponse
 from bills.function import *
 from itertools import chain
 from django.template import loader
+from members.models import *
 
 def billdetail(request, pk):
     bills = Bill.objects.get(pk=pk)
     items = lookup_items_bill(pk)
     cart= bills.billitems_set.first().cart
+    staff = Member.objects.get(id_member_id=cart.user.id)
+    date_photo = cart.event_set.filter(title = 'photo')[0]
+    date_makup = cart.event_set.filter(title = 'makeup')[0]
     clothe = items['clothe_bill']
     photo = items['photo_bill']
     makup = items['makup_bill']
@@ -19,10 +23,11 @@ def billdetail(request, pk):
     total = f"{bill_total['total']:,}"
     paid = f"{bill_total['paid']:,}"
     receivable = f"{bill_total['receivable']:,}"
-    template = loader.get_template('type_bill.html')
+    template = loader.get_template('bills/details.html')
     context = {
         'bills':bills,
         'items':items,
+        'staff':staff,
         'clothe': clothe,
         'cart': cart ,
         'first_clothe': first_clothe,
@@ -32,6 +37,9 @@ def billdetail(request, pk):
         'total': total,
         'paid' : paid,
         'receivable': receivable,
+        'date_photo': date_photo,
+        "date_makup":date_makup,
     }
     return HttpResponse(template.render(context, request))
+
 
