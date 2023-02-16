@@ -10,13 +10,24 @@ def billdetail(request, pk):
     items = lookup_items_bill(pk)
     cart= bills.billitems_set.first().cart
     staff = Member.objects.get(id_member_id=cart.user.id)
-    date_photo = cart.event_set.filter(title = 'photo')[0]
-    date_makup = cart.event_set.filter(title = 'makeup')[0]
+    date_photo = cart.event_set.filter(title = 'photo')
+    date_makup = cart.event_set.filter(title = 'makeup')
+    if len(date_photo) == 0:
+        date_photo =""
+    else:
+        date_photo= date_photo[0]
+
+    if len(date_makup) == 0:
+        date_makup =""
+    else:
+        date_makup = date_makup[0]
+
+
     clothe = items['clothe_bill']
     photo = items['photo_bill']
     makup = items['makup_bill']
     first_clothe = clothe[0][0]
-    bill_total =get_total_values_bill(pk)
+    bill_total = get_total_values_bill(pk)
     total_retail = f"{bill_total['total_retail']:,}"
     discount = f"{bill_total['discount']:,}"
     incurred = f"{bill_total['incurred']:,}"
