@@ -26,7 +26,10 @@ def billdetail(request, pk):
     clothe = items['clothe_bill']
     photo = items['photo_bill']
     makup = items['makup_bill']
-    first_clothe = clothe[0][0]
+    if len(clothe) ==0:
+        first_clothe =""
+    else:
+        first_clothe = clothe[0][0]
     bill_total = get_total_values_bill(pk)
     total_retail = f"{bill_total['total_retail']:,}"
     discount = f"{bill_total['discount']:,}"
