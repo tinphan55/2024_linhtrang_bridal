@@ -13,5 +13,5 @@ class Client (models.Model):
     #total_values = models.IntegerField (default=0)
 
     def __str__(self):
-        return str(self.full_name) + ' ' + str(self.code)
+        return str(self.full_name) + '_' + str(self.code)
 

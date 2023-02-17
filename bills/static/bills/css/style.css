@@ -180,6 +180,12 @@ table tfoot tr td:first-child {
   font-size: 1em;
   margin-bottom: 20px;
 }
+
+#next_payment{
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
 #notices{
   padding-left: 6px;
   border-left: 6px solid #0087C3;  
@@ -187,6 +193,8 @@ table tfoot tr td:first-child {
 
 #notices .notice {
   font-size: 1.2em;
+  font-style: italic;
+ 
 }
 
 footer {

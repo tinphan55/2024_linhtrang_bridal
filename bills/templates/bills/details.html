@@ -29,7 +29,7 @@
         </div>
         <div id="invoice">
           <h1>#{{ bills.code }}</h1>
-          <div class="date">Ngày tạo: {{ bills.created_at }}</div>
+          <div class="date">Ngày tạo: {{ bills.created_date }}</div>
           <div class="date">Ngày cưới: {{ cart.wedding_date }}</div>
         </div>
       </div>
@@ -43,7 +43,7 @@
             <tr>
               <th class="no">#</th>
               <th class="desc">DỊCH VỤ</th>
-              <th class="unit">GIÁ BÁN LẺ</th>
+              <th class="unit">GIÁ THUÊ LẺ</th>
               <th class="qty">SỐ LƯỢNG</th>
               <th class="total">GIẢM GIÁ</th>
             </tr>
@@ -53,7 +53,7 @@
               {% if clothe %}
                 {% for item in clothe %}
                   <tr>
-                    <td class="no">{{ forloop.parentloop.counter }}</td>
+                    <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
                     <td class="desc">{{ item.clothe.code }}, {{ item.clothe.name }}</td>
                     <td class="unit">{{ item.price }}</td>
                     <td class="qty">{{ item.qty }}</td>
@@ -72,7 +72,7 @@
             <tr>
               <th class="no">#</th>
               <th class="desc">DỊCH VỤ</th>
-              <th class="unit">GIÁ BÁN LẺ</th>
+              <th class="unit">GIÁ TIỀN</th>
               <th class="qty">SỐ LƯỢNG</th>
               <th class="total">GIẢM GIÁ</th>
             </tr>
@@ -82,7 +82,7 @@
               {% if makeup %}
                 {% for item in makeup %}
                   <tr>
-                    <td class="no">{{ forloop.parentloop.counter }}</td>
+                    <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
                     <td class="desc">{{ item.package.name }}, Gói {% if item.package.re_makup %} có {% else %} không {% endif %} bao gồm dặm lại</td>
                     <td class="unit">{{ item.price }}</td>
                     <td class="qty">{{ item.qty }}</td>
@@ -103,7 +103,7 @@
             <tr>
               <th class="no">#</th>
               <th class="desc">DỊCH VỤ</th>
-              <th class="unit">GIÁ BÁN LẺ</th>
+              <th class="unit">GIÁ CHỤP</th>
               <th class="qty">SỐ LƯỢNG</th>
               <th class="total">GIẢM GIÁ</th>
             </tr>
@@ -113,7 +113,7 @@
               {% if photo %}
                 {% for item in photo %}
                   <tr>
-                    <td class="no">{{ forloop.parentloop.counter }}</td>
+                    <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
                     <td class="desc">Có {{ item.package.number_location }} điểm chụp, {{ item.package.number_gate_photo }} hình cổng
                       {{ item.package.number_small_photo }} hình nhỏ, {{ item.package.origin_file }} file gốc,  {{ item.package.edit_file }} file chỉnh sửa, 
                       {% if item.package.is_album %} và có album {% else %} và không có album {% endif %} </td>
@@ -164,8 +164,14 @@
           
         </tfoot>
       
+        
       </table>
-      
+      {% if receivable_raw > 0 %}
+        <div id="next_payment">Ngày thanh toán tiếp theo: <strong>{{bills.next_payment}}</strong></div>
+      {% endif %}
+      {% if bills.note != "" %}
+        <div id="note">Ghi chú: {{bills.note}} </div>
+      {% endif %}
       <table border="0" cellspacing="0" cellpadding="0"></tableborder>
         <tr>
           <th class="cus"><h4>Khách hàng</h4></th>
@@ -187,15 +193,21 @@
      
       </table>
 
-      <div id="note">Ghi chú: {{bills.note}} </div>
-      <div id="thanks">Cám ơn Quý khách sử dụng dịch vụ</div>
+     
+      <div id="thanks">Cảm ơn quý khách hàng đã chọn LinhTrangbridal là đơn vị đồng hành trong ngày trọng đại</div>
       <div id="notices">
-        <div>LƯU Ý:</div>
-        <div class="notice">Chân hình trưng bài hình cổng LT hổ trợ cho khách thuê đồ + chụp hình  miễn phí 
-          Khách hàng tự ý HỦY HỢP ĐỒNG sẽ không nhận lại được cọc . 
-          Trang phục khách thuê giữ cẩn thận : nếu rách , bẩn nặng không xử lý được phải đền bù 
-          Khách thuê đồ trả đúng hẹn nếu trễ ngày tính phụ thử 10% giá trị hợp đồng thuê . 
-          Lưu ý khách đã kí hợp đồng muốn thây đổi trang phục khác vui lòng báo trước 2 ngày kể từ ngày kí hợp đồng để được đổi với giá giảm .Sau 3 ngày kể từ ngày kí hợp đồng trở lên trang phục khách muốn  thay đổi sẽ được tính giá lẻ</div>
+        <strong><div>LƯU Ý:</div></strong>
+        <div class="notice">
+          Khách hàng tự ý HỦY HỢP ĐỒNG sẽ không nhận lại được cọc . <br>
+
+          Chân hình trưng bài hình cổng từ LinhTrangbridal hổ trợ cho khách thuê đồ và chụp hình cưới tại LinhTrang miễn phí. <br>
+
+          Trang phục khách thuê giữ cẩn thận : nếu rách , bẩn nặng không xử lý được phải đền bù theo giá thuê. <br>
+
+          Khách thuê đồ trả đúng hẹn nếu trễ ngày tính phụ thử 10% giá trị hợp đồng thuê. <br> 
+
+          Lưu ý khách đã kí hợp đồng muốn thay đổi trang phục khác vui lòng báo trước 2 ngày kể từ ngày kí hợp đồng để được đổi với giá giảm .Sau 3 ngày kể từ ngày kí hợp đồng trở lên trang phục khách muốn  thay đổi sẽ được tính giá lẻ. <br>
+</div>
       </div>
     </main>
    
