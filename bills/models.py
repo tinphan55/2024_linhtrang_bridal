@@ -11,19 +11,16 @@ class Bill(models.Model):
     code = models.CharField(max_length=10)
     created_date = models.DateTimeField(auto_now_add=True)
     note = models.TextField(default= "", null = True, blank= True)
+    next_payment = models.DateField(null = True, blank= True)
       
     
-    def save(self, *args, **kwargs):
-            month = datetime.now().month
-            latest_bill = Bill.objects.aggregate(Max("id"))["id__max"]
-            latest_id = latest_bill + 1 if latest_bill else 1
-            self.code =  str(latest_id) +"_"+ str(month) 
-            super().save(*args, **kwargs)
+
         
 
     
     def __str__(self):
-        return str(self.code) 
+        month = datetime.now().month
+        return str(self.id)+ "_" + str(month)
     
     
     

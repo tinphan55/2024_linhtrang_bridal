@@ -157,7 +157,7 @@ def receivable_row(obj):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
+    list_display=('id','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
     fields = ['user','client','wedding_date','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_']
     list_display_links=('client',)
     search_fields=('client__code',)
