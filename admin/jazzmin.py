@@ -77,7 +77,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": [ "order","clients","services_admin","event_calendar","auth",],
+    "order_with_respect_to": [ "order","bills","clients","services_admin","event_calendar","auth",],
 
     # Custom links to append to app groups, keyed on app name
     # "custom_links": {
@@ -106,6 +106,7 @@ JAZZMIN_SETTINGS = {
         "services_admin.Tag":"fas fa-tags",
         "services_admin.ComboItem":"far fa-object-group",
         "clients.Client":"fas fa-male",
+        "bills.Bill" : "fas fa-receipt",
         "event_calendar.Event":"far fa-calendar-check"
     
 
@@ -145,7 +146,7 @@ JAZZMIN_SETTINGS = {
     "changeform_format": "horizontal_tabs",
     # override change forms on a per modeladmin basis
     "changeform_format_overrides": 
-    {"auth.user": "collapsible", "order.Cart": "vertical_tabs"},
+    {"auth.user": "collapsible", "order.Cart": "vertical_tabs", "bills.Bill":"single"},
 
 
    

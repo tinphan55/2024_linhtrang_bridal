@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+
+		.banner {
+			background-image: url("{% static 'frontend/img/web.png' %}");
+			background-size: cover;
+			background-position: center;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.contact {
+			background-color: #ddd;
+			padding: 1rem;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 15vh;
+		}
+
+		.contact h3 {
+			margin: -10
+    ;
+		}
+	</style>
+</head>
+<body>
+	<div class="banner">
+		<!-- banner content here -->
+	</div>
+	

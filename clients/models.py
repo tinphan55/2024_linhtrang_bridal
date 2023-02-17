@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import  Sum, F
 
+
 class Client (models.Model):
     full_name = models.CharField(max_length= 50)
     code = models.CharField(max_length= 50)
@@ -13,5 +14,4 @@ class Client (models.Model):
 
     def __str__(self):
         return str(self.full_name) + ' ' + str(self.code)
-    
 
