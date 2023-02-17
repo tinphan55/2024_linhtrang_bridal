@@ -15,8 +15,8 @@ def billdetail(request, pk):
     clothe = items['clothe_bill']
     photo = items['photo_bill']
     makup = items['makup_bill']
+    code = str(pk)+ "_" + str(datetime.now().month)
     event = []
-
     for item in  list_cart:
         event_item = item.cart.event_set.all()
         event.append(event_item)
@@ -52,6 +52,7 @@ def billdetail(request, pk):
     template = loader.get_template('bills/details.html')
     context = {
         'bills':bills,
+        'code': code,
         'items':items,
         'staff':staff,
         'clothe': clothe,
