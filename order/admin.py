@@ -72,7 +72,7 @@ class MakeupServiceInline(admin.StackedInline):
 
 class AccessoryServiceInline(admin.TabularInline):
     model =  AccessorysSerive
-    fields = ['product','qty', 'price','discount','total_items_']
+    fields = ['product','qty','discount','total_items_']
     #raw_id_fields = ['product']
     readonly_fields = ['total_items_',]
     @admin.display(description='total_items_')

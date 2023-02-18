@@ -157,6 +157,9 @@ class AccessorysSerive (CartItems):
         limit_choices_to={'is_available': True})
     def __str__(self):
         return str(self.product)
+    def save(self, *args, **kwargs):
+        self.price = Accessory.objects.get(id=self.product_id).price
+        super(AccessorysSerive, self).save(*args, **kwargs)
     
 class IncurredCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
