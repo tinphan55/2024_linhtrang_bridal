@@ -48,6 +48,7 @@ def billdetail(request, pk):
     total = f"{bill_total['total']:,}"
     paid = f"{bill_total['paid']:,}"
     receivable_raw = bill_total['receivable']
+    incurred_raw = bill_total['incurred']
     receivable = f"{bill_total['receivable']:,}"
     template = loader.get_template('bills/details.html')
     context = {
@@ -67,6 +68,7 @@ def billdetail(request, pk):
         'date_photo': date_photo,
         "date_makup":date_makup,
         'receivable_raw':receivable_raw,
+        'incurred_raw': incurred_raw
     }
     return HttpResponse(template.render(context, request))
 

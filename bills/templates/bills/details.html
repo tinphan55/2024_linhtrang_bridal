@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>{{ bills.code }}</title>
+    <title> bill:{{ code }}- {{ cart.client.full_name }}</title>
     <link rel="stylesheet" href="{%static 'bills/css/style.css' %}" media="all" /> 
 
   </head>
@@ -36,9 +36,11 @@
       
       {% if items.clothe_bill %}
         <table border="0" cellspacing="0" cellpadding="0">
-          <h4>Cho thuê Áo cưới, ngày giao {{ first_clothe.delivery_date }}
-            , ngày trả {{ first_clothe.return_date }}
-          </h4>
+          <h4>  {% if first_clothe.clothe.name %}
+            Cho thuê Áo cưới, ngày giao {{ first_clothe.delivery_date }}, ngày trả {{ first_clothe.return_date }}
+          {% else %}
+            Cho thuê Phụ kiện 
+          {% endif %} </h4>
           <thead>
             <tr>
               <th class="no">#</th>
@@ -54,7 +56,13 @@
                 {% for item in clothe %}
                   <tr>
                     <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-                    <td class="desc">{{ item.clothe.code }}, {{ item.clothe.name }}</td>
+                    <td class="desc">
+                      {% if item.clothe.code %}
+                        {{ item.clothe.code }}, {{ item.clothe.name }}
+                      {% else %}
+                        {{ item.product.name }}
+                      {% endif %}</td>
+                 
                     <td class="unit">{{ item.price }}</td>
                     <td class="qty">{{ item.qty }}</td>
                     <td class="total">{{ item.discount }}</td>
@@ -67,7 +75,13 @@
 
       {% if items.makup_bill %}
         <table border="0" cellspacing="0" cellpadding="0">
-          <h4>Trang điểm cô dâu, bắt đầu đãi {{date_makup.start_time}} , kết thúc lúc {{date_makup.end_time}} </h4>
+          <h4>Trang điểm cô dâu, bắt đầu đãi
+            {% if date_makup.start_time %}
+              {{date_makup.start_time}} , kết thúc lúc {{date_makup.end_time}}
+            {% else %}
+               ........................,kết thúc lúc......................
+            {% endif %}
+             </h4>
           <thead>
             <tr>
               <th class="no">#</th>
@@ -98,7 +112,12 @@
       
       {% if items.photo_bill %}
         <table border="0" cellspacing="0" cellpadding="0">
-          <h4>Chụp hình cưới, ngày chụp hình {{date_photo.start_time}} </h4>
+          <h4>Chụp hình cưới, ngày chụp hình 
+            {% if date_photo.start_time %}
+              {{date_photo.start_time}}
+            {% else %}
+             ............................
+            {% endif %} </h4>
           <thead>
             <tr>
               <th class="no">#</th>
@@ -141,11 +160,14 @@
             <td colspan="2">GIẢM GIÁ</td>
             <td>{{discount}}</td>
           </tr>
+          {% if incurred_raw != 0 %}
           <tr>
             <td colspan="2"></td>
             <td colspan="2">PHÁT SINH</td>
             <td>{{incurred}}</td>
           </tr>
+          {% endif %}
+          
           <tr>
             <td colspan="2"></td>
             <td colspan="2">TỔNG TIỀN THANH TOÁN</td>
