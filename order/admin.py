@@ -76,7 +76,7 @@ class ReturnAccessoryAdmin(admin.ModelAdmin):
         return qs.filter(product__is_sell=False)
     model = ReturnAccessory
     list_display = ('cart','product','qty' ,'delivery_date', 'return_date', 'status', 'returned_at' )
-    fields = ['clothe','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
+    fields = ['product','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
     readonly_fields = ['product','qty', 'delivery_date', 'return_date','status','returned_at', 'noti']
     list_display_links = ('product',)
     list_filter =  ('is_returned','cart__wedding_date' )
