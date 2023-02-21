@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from .models import *
 from import_export.admin import ImportExportModelAdmin
 from .resources import ProductResource
+from services_admin.function import *
 
 
 
@@ -23,12 +24,27 @@ class ClotheAdminView(admin.ModelAdmin):
         form = super(ClotheAdminView, self).get_form(request, obj, **kwargs)
         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=1)
         return form 
-    list_display = ('code','name','ranking','qty','price', 'is_available','color')
+    list_display = ('code','name','ranking','available_qty','return_qty','order_qty','price', 'is_available','color')
     fields = ('code','name','ranking','qty', 'is_available','color','description','tags', 'images' )
     list_display_links = ('name',)
     search_fields = ('code', )
     readonly_fields =('category','price')
     actions = [not_available]
+    #Đúng
+    def available_qty(self, obj):
+         date_check = datetime.now()
+         qty = available_qty_clothe_admin(obj.pk,date_check )
+         return qty[0]
+    #đúng
+    def return_qty(self, obj):
+         date_check = datetime.now()
+         qty = available_qty_clothe_admin(obj.pk,date_check)
+         return qty[1]
+    #đúng
+    def order_qty(self, obj):
+         date_check = datetime.now()
+         qty = available_qty_clothe_admin(obj.pk,date_check)
+         return qty[2]
 
 
 class ClotheAdmin(ClotheImportAdmin,ClotheAdminView ):
@@ -58,25 +74,52 @@ class MakeupAdmin(admin.ModelAdmin):
     readonly_fields =('category',)
     actions = [not_available]
 
+
 class AccessoryAdmin(admin.ModelAdmin):
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(AccessoryAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['ranking'].queryset = Ranking.objects.filter(category=4)
-        return form 
-    list_display = ('id','name','ranking','price','qty', 'is_available')
-    fields = ('name','ranking','qty','price', 'is_available','description' , 'tags')
-    list_display_links = ('name',)
-    search_fields = ('name',)
-    readonly_fields =('category',)
-    actions = [not_available]
+     def get_form(self, request, obj=None, **kwargs):
+         form = super(AccessoryAdmin, self).get_form(request, obj, **kwargs)
+         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=4)
+         return form 
+     list_display = ('id','name','ranking','is_sell','price','qty_available','qty_add','qty_order', 'is_available')
+     fields = ('name','ranking','is_sell','qty','price', 'is_available','description' , 'tags')
+     list_display_links = ('name',)
+     search_fields = ('name',)
+     readonly_fields =('category',)
+     actions = [not_available]
+     def qty_available(self, obj):
+         date_check = datetime.now()
+         qty = available_qty_accessory_admin(obj.pk,date_check )
+         return qty[0]
+     def qty_add(self, obj):
+         date_check = datetime.now()
+         qty = available_qty_accessory_admin(obj.pk,date_check )
+         return qty[2]
+     def qty_order(self, obj):
+         date_check = datetime.now()
+         qty = available_qty_accessory_admin(obj.pk,date_check )
+         return qty[3]
+    
+
+
+
+
+
+
+   
+# class VolatilityAccessoryAdmin(admin.ModelAdmin):
+#     pass
 
 class RankingAdmin(admin.ModelAdmin):
     list_display = ('id','rank','type','price', 'category', 'description')
     search_fields = ('rank',)
 
+class VolatilityAccessoryAdmin(admin.ModelAdmin):
+    model = VolatilityAccessory
+    list_display = ('product','created_date','qty',)
 
 
-#admin.site.register(ComboItem)
+
+admin.site.register(VolatilityAccessory ,VolatilityAccessoryAdmin)
 admin.site.register(Accessory, AccessoryAdmin)
 admin.site.register(Makeup, MakeupAdmin)
 admin.site.register(Clothe, ClotheAdmin)

@@ -8,11 +8,30 @@ from django.utils.translation import gettext_lazy as _
 today = date.today()
 
 
+
 class CheckProductsForm(forms.Form):
     code = forms.CharField()
-    #date_check = forms.DateField(
-    #    widget=forms.TextInput(attrs={'min': today, 'value': today, 'type': 'date'}), required=True)
-   
+    start = forms.DateField(
+        widget=forms.TextInput(attrs={
+            'type': 'date',
+            #'input_formats': ['%d-%m-%Y'],
+            #'placeholder': 'dd-mm-yyyy'
+        }),
+        #initial=datetime.today().strftime('%d-%m-%Y'),
+        required=True
+    
+    )
+    end = forms.DateField(
+        widget=forms.TextInput(attrs={
+            'type': 'date',
+            #'input_formats': ['%d-%m-%Y'],
+            #'placeholder': 'dd-mm-yyyy'
+        }),
+        #initial=datetime.today().strftime('%d-%m-%Y'),
+        required=True
+    )
+
+
 
 class CartForm(ModelForm):
     class Meta:

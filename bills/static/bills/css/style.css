@@ -172,9 +172,11 @@ table tfoot tr td:first-child {
   border: none;
 }
 
-#thanks{
+#thanks {
   font-size: 1.5em;
   margin-bottom: 50px;
+  font-style: italic;
+  text-align: center;
 }
 #note{
   font-size: 1em;
