@@ -91,6 +91,7 @@ class CartItems(models.Model):
     class Meta:
         abstract = True
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
+    created_at = models.DateTimeField(default=datetime.now)
     price = models.FloatField(blank=True, default=0)
     qty = models.IntegerField(default=1)
     discount = models.IntegerField(null= True, blank=True, default=0)  
@@ -123,11 +124,7 @@ class ClotheService(CartItems):
             self.delivery_date = self.cart.wedding_date - timedelta(days=2)
         if self.return_date == None:
             self.return_date = self.cart.wedding_date + timedelta(days=2) 
-        today = date.today()
-        if today > self.delivery_date and self.returned_at == None:
-            self.is_returned = False
-        if self.is_returned == False and today > self.return_date:
-            self.noti = str('Thu hồi đồ cưới, đã trễ hẹn. Ngày thu hồi') + str(self.return_date)
+       
         super(ClotheService, self).save(*args, **kwargs)
 
 class PhotoService(CartItems):
@@ -155,10 +152,24 @@ class MakeupService(CartItems):
 class AccessorysSerive (CartItems):
     product = models.ForeignKey(Accessory, on_delete = models.CASCADE, 
         limit_choices_to={'is_available': True})
+    delivery_date = models.DateField(null= True, blank=True)
+    return_date = models.DateField(null= True, blank=True)
+    is_returned = models.BooleanField(default=False) 
+    returned_at = models.DateTimeField(null=True, blank=True)  
+    note = models.TextField(max_length=500, null = True, blank=True)
+    noti = models.CharField (max_length=200, null = True, blank=True)
     def __str__(self):
         return str(self.product)
     def save(self, *args, **kwargs):
         self.price = Accessory.objects.get(id=self.product_id).price
+        if self.delivery_date == None:
+            self.delivery_date = self.cart.wedding_date - timedelta(days=2)
+        if self.return_date == None:
+            self.return_date = self.cart.wedding_date + timedelta(days=2) 
+        today = date.today()
+       
+        # if self.is_returned == False and today > self.return_date:
+        #     self.noti = str('Thu hồi đồ cưới, đã trễ hẹn. Ngày thu hồi') + str(self.return_date)
         super(AccessorysSerive, self).save(*args, **kwargs)
     
 class IncurredCart(models.Model):
@@ -179,12 +190,21 @@ class PaymentScheduleCart(models.Model):
         return str(self.cart)
     
 
-class ReturnItems (ClotheService):
+class ReturnClothe (ClotheService):
     class Meta:
         proxy = True
     
     def __str__(self):
-        return str(self.clothe.name)
+        return str(self.clothe.code)
+        
+
+class ReturnAccessory (AccessorysSerive):
+    class Meta:
+        proxy = True
+    def get_queryset(self):
+        return super().get_queryset().filter(product__is_sell=False)
+    def __str__(self):
+        return str(self.product.name)
 
 # class CartCombo (models.Model):
 #     name = models.CharField(max_length=100)

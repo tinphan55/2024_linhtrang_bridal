@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from datetime import datetime
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -87,7 +88,7 @@ class Makeup(ItemBase):
         return self.name
     
 class Accessory(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50,null=False, blank=False, unique=True )
     ranking = models.ForeignKey(Ranking,on_delete=models.CASCADE, blank=True, null=True )
     qty = models.IntegerField(null=False)
     description = models.TextField(max_length=500, blank=True)
@@ -97,6 +98,9 @@ class Accessory(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('Tag', blank=True, null=True)
+    is_sell = models.BooleanField(default=False)
+    #date_check = models.DateField(null = True, blank= True, default= datetime.now())
+  
 
     def __str__(self):
         return self.name
@@ -108,4 +112,12 @@ class Tag (models.Model):
     name = models.CharField(max_length=50)
     def __str__(self):
         return f"{self.name}"
+
+class VolatilityAccessory (models.Model):
+    product = models.ForeignKey(Accessory, on_delete = models.CASCADE, 
+        limit_choices_to={'is_available': True})
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+    qty = models.IntegerField(null=False)
+    description = models.TextField(max_length=500, blank=True)
 

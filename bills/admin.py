@@ -69,6 +69,8 @@ class BillAdmin(admin.ModelAdmin):
     
     cart_with_links.short_description = 'Cart'
 
+
+
    
 
   

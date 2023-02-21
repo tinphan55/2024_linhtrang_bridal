@@ -7,6 +7,8 @@ from event_calendar.models import Event
 from datetime import datetime, timedelta, date
 from itertools import chain
 from .forms import *
+from django.db.models import Q
+
 
 def convent_str_total_items(obj):
     total_items = obj.total_items
@@ -21,10 +23,13 @@ class ClotheServiceInline(admin.StackedInline):
     def total_items_(self,obj):
         return convent_str_total_items(obj, )
     
-@admin.action(description='Confirm Clothe is returned')
+@admin.action(description='Confirm Items is returned')
 def returned (modeladmin, request, queryset):
-    for ReturnItems in queryset:
-        if ReturnItems.is_returned == False:
+    for ReturnClothe in queryset:
+        if ReturnClothe.is_returned == False:
+            queryset.update(is_returned = True )
+            queryset.update(returned_at = datetime.now())
+        elif ReturnAccessory.is_returned == False:
             queryset.update(is_returned = True )
             queryset.update(returned_at = datetime.now())
     
@@ -33,26 +38,68 @@ def returned (modeladmin, request, queryset):
 def not_return (modeladmin, request, queryset):
     queryset.update(is_returned = False )
 
-class ReturnItemsAdmin(admin.ModelAdmin):
+
+
+class ReturnClotheAdmin(admin.ModelAdmin):
     def clothe_id(self, obj):
         return obj.clothe.id
-    model = ReturnItems
-    list_display = ('cart','clothe','get_color','qty' ,'delivery_date', 'return_date', 'is_returned', 'returned_at' )
+    model = ReturnClothe
+    list_display = ('cart','clothe','get_color','qty' ,'delivery_date', 'return_date', 'status', 'returned_at' )
     fields = ['clothe','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
-    readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','returned_at', 'noti']
+    readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','status','returned_at', 'noti']
     list_display_links = ('clothe',)
-    list_filter =  ('is_returned','returned_at','cart__wedding_date' )
-    search_fields = ('clothe__code','clothe__name', 'cart__client__phone', 'cart__id')
-    #search_help_text = ('test')
+    list_filter =  ('is_returned','cart__wedding_date' )
+    search_fields = ( 'cart__client__phone', 'cart__id', 'clothe__code')
     actions = [returned, not_return]
     admin.site.disable_action('delete_selected')
     @admin.display(description='color_')
     def get_color(self, obj):
         return obj.clothe.color
+    def status(self, obj):
+        today = date.today()
+        if today < obj.delivery_date:
+            status = "Chờ cho thuê"
+        elif today >= obj.delivery_date and obj.returned_at == None:
+            if  today <= obj.return_date:
+                status = "Đang cho thuê"
+            elif today > obj.return_date:
+                num_date = today - obj.return_date
+                status = str("Quá hạn thuê ") + str(num_date.days)+str(" ngày")
+        else:
+            status = "Đã thu hồi"
+        return status
     
+class ReturnAccessoryAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(product__is_sell=False)
+    model = ReturnAccessory
+    list_display = ('cart','product','qty' ,'delivery_date', 'return_date', 'status', 'returned_at' )
+    fields = ['clothe','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
+    readonly_fields = ['product','qty', 'delivery_date', 'return_date','status','returned_at', 'noti']
+    list_display_links = ('product',)
+    list_filter =  ('is_returned','cart__wedding_date' )
+    search_fields = ( 'cart__client__phone', 'cart__id', 'product__name')
+    actions = [returned, not_return]
+    #admin.site.disable_action('delete_selected')
+    def status(self, obj):
+        today = date.today()
+        if today < obj.delivery_date:
+            status = "Chờ cho thuê"
+        elif today >= obj.delivery_date and obj.returned_at == None:
+            if  today <= obj.return_date:
+                status = "Đang cho thuê"
+            elif today > obj.return_date:
+                num_date = today - obj.return_date
+                status = str("Quá hạn thuê ") + str(num_date.days)+str(" ngày")
+        else:
+            status = "Đã thu hồi"
+        return status
     
 
-
+    
+ 
+    
 
 class PhotoScheduleInline(admin.StackedInline):
     model =  Event 
@@ -78,6 +125,9 @@ class AccessoryServiceInline(admin.TabularInline):
     @admin.display(description='total_items_')
     def total_items_(self,obj):
         return convent_str_total_items(obj, )
+    
+
+    
     
 
 class PhotoServiceInline(admin.StackedInline):
@@ -160,7 +210,7 @@ class CartAdmin(admin.ModelAdmin):
     list_display=('id','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
     fields = ['user','client','wedding_date','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_']
     list_display_links=('client',)
-    search_fields=('client__code',)
+    search_fields=('client__phone',)
      #['created_at','wedding_date',]
     readonly_fields = [ 'created_at','total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_']
     list_filter = ('created_at','user__username', 'client__full_name')
@@ -202,5 +252,6 @@ class CartAdmin(admin.ModelAdmin):
    
 
 admin.site.register(Cart,CartAdmin )
-admin.site.register(ReturnItems, ReturnItemsAdmin)
+admin.site.register(ReturnClothe, ReturnClotheAdmin)
+admin.site.register(ReturnAccessory,ReturnAccessoryAdmin)
 
