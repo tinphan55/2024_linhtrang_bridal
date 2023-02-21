@@ -85,10 +85,12 @@ class ReturnAccessoryAdmin(admin.ModelAdmin):
     #admin.site.disable_action('delete_selected')
     def status(self, obj):
         today = date.today()
-        if obj.delivery_date == None:
-            obj.delivery_date ='2023-01-01'
+        if obj.delivery_date == None and obj.return_date == None :
+            obj.delivery_date = today
+            obj.return_date = today
         else:
             obj.delivery_date = obj.delivery_date
+            obj.return_date =  obj.return_date
         if today < obj.delivery_date:
             status = "Chờ cho thuê"
         elif today >= obj.delivery_date and obj.returned_at == None:
