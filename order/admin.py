@@ -37,6 +37,7 @@ def returned (modeladmin, request, queryset):
 @admin.action(description='NOT returned')   
 def not_return (modeladmin, request, queryset):
     queryset.update(is_returned = False )
+    queryset.update(returned_at = None)
 
 
 
@@ -84,6 +85,10 @@ class ReturnAccessoryAdmin(admin.ModelAdmin):
     #admin.site.disable_action('delete_selected')
     def status(self, obj):
         today = date.today()
+        if obj.delivery_date == None:
+            obj.delivery_date ='2023-01-01'
+        else:
+            obj.delivery_date = obj.delivery_date
         if today < obj.delivery_date:
             status = "Chờ cho thuê"
         elif today >= obj.delivery_date and obj.returned_at == None:
@@ -119,7 +124,7 @@ class MakeupServiceInline(admin.StackedInline):
 
 class AccessoryServiceInline(admin.TabularInline):
     model =  AccessorysSerive
-    fields = ['product','qty','discount','total_items_']
+    fields = ['product','qty','discount','total_items_', 'delivery_date', 'return_date']
     #raw_id_fields = ['product']
     readonly_fields = ['total_items_',]
     @admin.display(description='total_items_')
