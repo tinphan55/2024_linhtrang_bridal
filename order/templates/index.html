@@ -20,24 +20,24 @@
   
     <hr/>
     <h1 class="duy"> Danh sách trang phục cho thuê</h1>
-    <table class="table" style="border: 1px solid black;">
+    <table class="table" style="border: 1px solid rgb(239, 221, 221); border-top-color:rgb(234, 228, 228);">
         <thead>
           <tr>
-            <th style="border: 1px solid black;">Mã Code</th>
-            <th style="border: 1px solid black;">Ngày</th>
-            <th style="border: 1px solid black; width: 100px; background-color: #c3e6cb;">Khả dụng</th>
-            <th style="border: 1px solid black;">Tên</th>
-            <th style="border: 1px solid black;">Loại</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Mã Code</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Ngày</th>
+            <th style="border: 1px solid rgb(234, 228, 228); width: 100px; background-color: #e9f9ee;">Khả dụng</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Tên</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Loại</th>
           </tr>
         </thead>
         <tbody>
           {% for x in calendar %}
           <tr>
-            <td style="border: 1px solid black;">{{code }}</td>
-            <td style="border: 1px solid black;">{{ x.date  }}</td>
-            <td style="border: 1px solid black; width: 100px; background-color: #c3e6cb;">{{ x.qty_available }}</td>
-            <td style="border: 1px solid black;">{{ name }}</td>
-            <td style="border: 1px solid black;">{{ category }}</td>
+            <td style="border: 1px solid rgb(234, 228, 228);">{{code }}</td>
+            <td style="border: 1px solid rgb(234, 228, 228);">{{ x.date  }}</td>
+            <td style="border: 1px solid rgb(234, 228, 228); width: 100px; background-color: #338951;">{{ x.qty_available }}</td>
+            <td style="border: 1px solid rgb(234, 228, 228);">{{ name }}</td>
+            <td style="border: 1px solid rgb(234, 228, 228);">{{ category }}</td>
           </tr>
           {% endfor %}
         </tbody>
