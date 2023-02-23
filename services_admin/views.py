@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from .resources import ProductResource
 from tablib import Dataset
-from .models import Product
+from .models import *
 from django.template import loader
 from django.http import HttpResponse
+
 
 def import_data(request):
     if request.method == 'POST':
@@ -27,20 +28,4 @@ def import_data(request):
     return render(request, 'import.html')    
 
 
-#demo load trang mới để xem
-def products(request):
-  myproducts = Product.objects.all().values()
-  template = loader.get_template('all_products.html')
-  context = {
-    'myproducts': myproducts,
-  }
-  return HttpResponse(template.render(context, request))
-#trang chi tiết
-def details(request, id):
-  myproducts = Product.objects.get(id=id)
-  template = loader.get_template('details.html')
-  context = {
-     'myproducts': myproducts,
-  }
-  return HttpResponse(template.render(context, request))
 
