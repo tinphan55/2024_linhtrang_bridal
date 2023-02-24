@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'event_calendar.apps.CalConfig', 
     'frontend',
     'bills', 
+    'report',
   
   
 ]

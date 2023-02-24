@@ -41,51 +41,51 @@ class Cart(models.Model):
         return self.id
 
         
-    def save(self, *args, **kwargs):
-        clothe = ClotheService.objects.filter(cart_id =self.id )
-        total = clothe.aggregate(total=Sum('total_items'))
-        total_price = total['total']
-        if total_price == None:
-            total_clothe = 0
-        else:
-            total_clothe = total_price
+    # def save(self, *args, **kwargs):
+    #     clothe = ClotheService.objects.filter(cart_id =self.id )
+    #     total = clothe.aggregate(total=Sum('total_items'))
+    #     total_price = total['total']
+    #     if total_price == None:
+    #         total_clothe = 0
+    #     else:
+    #         total_clothe = total_price
         
-        items_photo = Cart.objects.annotate(total= Sum(F('photoservice__total_items'))).filter(pk=self.pk).values()
-        if items_photo.count() ==0:
-            total_photo = 0
-        else:
-            total_photo= items_photo[0]['total'] or 0
+    #     items_photo = Cart.objects.annotate(total= Sum(F('photoservice__total_items'))).filter(pk=self.pk).values()
+    #     if items_photo.count() ==0:
+    #         total_photo = 0
+    #     else:
+    #         total_photo= items_photo[0]['total'] or 0
         
         
-        items_makeup = Cart.objects.annotate(total= Sum(F('makeupservice__total_items'))).filter(pk=self.pk).values()
-        if items_makeup.count() ==0:
-            total_makecup = 0
-        else:
-            total_makecup = items_makeup[0]['total'] or 0
+    #     items_makeup = Cart.objects.annotate(total= Sum(F('makeupservice__total_items'))).filter(pk=self.pk).values()
+    #     if items_makeup.count() ==0:
+    #         total_makecup = 0
+    #     else:
+    #         total_makecup = items_makeup[0]['total'] or 0
         
-        items_accessory = Cart.objects.annotate(total= Sum(F('accessorysserive__total_items'))).filter(pk=self.pk).values()
-        if items_accessory.count()==0:
-            total_accessory = 0
-        else:
-            total_accessory = items_accessory[0]['total'] or 0
-        total =  total_clothe + total_photo + total_makecup + total_accessory
-        self.total_price = total 
+    #     items_accessory = Cart.objects.annotate(total= Sum(F('accessorysserive__total_items'))).filter(pk=self.pk).values()
+    #     if items_accessory.count()==0:
+    #         total_accessory = 0
+    #     else:
+    #         total_accessory = items_accessory[0]['total'] or 0
+    #     total =  total_clothe + total_photo + total_makecup + total_accessory
+    #     self.total_price = total 
 
-        items_incurred = Cart.objects.annotate(total= Sum(F('incurredcart__amount'))).filter(id=self.id).values()
-        if items_incurred.count() ==0:
-            self.incurred = 0
-        else:
-            self.incurred = items_incurred[0]['total'] or 0
-        self.total_bill = self.total_price + self.incurred
+    #     items_incurred = Cart.objects.annotate(total= Sum(F('incurredcart__amount'))).filter(id=self.id).values()
+    #     if items_incurred.count() ==0:
+    #         self.incurred = 0
+    #     else:
+    #         self.incurred = items_incurred[0]['total'] or 0
+    #     self.total_bill = self.total_price + self.incurred
 
-        items_payment = Cart.objects.annotate(total= Sum(F('paymentschedulecart__amount'))).filter(id=self.id).values()
-        if items_payment.count() ==0:
-            self.paid = 0
-        else:
-            self.paid = items_payment[0]['total'] or 0
-        self.receivable = self.total_bill - self.paid
+    #     items_payment = Cart.objects.annotate(total= Sum(F('paymentschedulecart__amount'))).filter(id=self.id).values()
+    #     if items_payment.count() ==0:
+    #         self.paid = 0
+    #     else:
+    #         self.paid = items_payment[0]['total'] or 0
+    #     self.receivable = self.total_bill - self.paid
         
-        super(Cart, self).save(*args, **kwargs)
+    #     super(Cart, self).save(*args, **kwargs)
 
 class CartItems(models.Model):
     class Meta:

@@ -23,7 +23,7 @@ class ClotheServiceInline(admin.StackedInline):
     def total_items_(self,obj):
         return convent_str_total_items(obj, )
     
-@admin.action(description='Confirm Items is returned')
+@admin.action(description='Xác nhận sản phẩm được trả')
 def returned (modeladmin, request, queryset):
     for ReturnClothe in queryset:
         if ReturnClothe.is_returned == False:
@@ -34,7 +34,7 @@ def returned (modeladmin, request, queryset):
             queryset.update(returned_at = datetime.now())
     
 
-@admin.action(description='NOT returned')   
+@admin.action(description='Hủy trả sản phẩm')   
 def not_return (modeladmin, request, queryset):
     queryset.update(is_returned = False )
     queryset.update(returned_at = None)

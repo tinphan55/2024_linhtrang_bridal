@@ -15,7 +15,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class ClotheImportAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
 
-@admin.action(description='Confirm items is NOT available')   
+@admin.action(description='Xác nhận sản phẩm KHÔNG còn khả dụng')   
 def not_available (modeladmin, request, queryset):
     queryset.update(is_available = False )
 
@@ -84,6 +84,7 @@ class AccessoryAdmin(admin.ModelAdmin):
      fields = ('name','ranking','is_sell','qty','price', 'is_available','description' , 'tags')
      list_display_links = ('name',)
      search_fields = ('name',)
+     list_filter=('is_sell',)
      readonly_fields =('category',)
      actions = [not_available]
      def qty_available(self, obj):
