@@ -4,7 +4,7 @@ from .models import *
 # Register your models here.
 class LayoutHomepageAdmin (admin.ModelAdmin):
     model = LayoutHomepage
-    list_display =  ['block','is_menu','is_available',]
+    list_display =  ['id','block','is_menu','is_available',]
     
 class BlockItemsAdmin (admin.ModelAdmin):
     model = LayoutHomepage

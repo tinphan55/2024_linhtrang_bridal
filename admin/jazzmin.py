@@ -2,7 +2,7 @@ JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Shop Admin",
       # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Library",
+    "site_header": "Linh Trang",
      # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "LINH TRANG BRIDAL",
 
@@ -13,7 +13,8 @@ JAZZMIN_SETTINGS = {
     "site_logo_classes": "img-circle",
 
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
-    "site_icon": None,
+    "site_icon": "/bills/img/logo.png",
+    "site_logo": "/bills/img/logo.png",
 
     # Welcome text on the login screen
     "welcome_sign": "Welcome to Linh Trang - Bridal",
@@ -38,13 +39,15 @@ JAZZMIN_SETTINGS = {
 
         # Url that gets reversed (Permissions can be added)
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
-
         # external url that opens in a new window (Permissions can be added)
         {"name": "Check Clothes", "url": "http://linhtrangbridal.online/checkproducts/", "new_window": True},
         {"name": "Calendar", "url":"http://linhtrangbridal.online/calendar/", "new_window": True},
-
+       
+    
         # model admin to link to (Permissions checked against model)
         {"model": "order.Cart"},
+
+        
 
         # App with dropdown menu to all its models pages (Permissions checked against models)
         # {"model": "order.Cart"},
