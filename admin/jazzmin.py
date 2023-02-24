@@ -60,7 +60,7 @@ JAZZMIN_SETTINGS = {
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
        # {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
-        {"model": "auth.user"}
+        #{"model": "auth.user"}
     ],
 
     #############
@@ -80,7 +80,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": [ "order","bills","clients","services_admin","event_calendar","auth",],
+    "order_with_respect_to": [ "order","bills","report","services_admin","clients","event_calendar","auth",],
 
     # Custom links to append to app groups, keyed on app name
     # "custom_links": {
@@ -109,11 +109,11 @@ JAZZMIN_SETTINGS = {
         "services_admin.ranking": "fas fa-star",
         "services_admin.Tag":"fas fa-tags",
         "services_admin.VolatilityAccessory":"fas fa-warehouse",
-        
         "services_admin.ComboItem":"far fa-object-group",
         "clients.Client":"fas fa-male",
         "bills.Bill" : "fas fa-receipt",
-        "event_calendar.Event":"far fa-calendar-check"
+        "event_calendar.Event":"far fa-calendar-check",
+        "report.Report":"fas fa-flag-checkered" ,
     
 
 
