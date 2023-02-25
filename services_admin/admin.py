@@ -118,6 +118,7 @@ class AccessoryAdmin(admin.ModelAdmin):
 class RankingAdmin(admin.ModelAdmin):
     list_display = ('id','rank','type','price','discount', 'category', 'description')
     list_display_links = ('id', 'rank')
+    list_filter = ('category',)
     search_fields = ('rank',)
 
 class VolatilityAccessoryAdmin(admin.ModelAdmin):
