@@ -30,6 +30,7 @@ class ClotheAdminView(admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('code', )
     readonly_fields =('category','price')
+    list_filter = ('ranking','is_available', )
     actions = [not_available]
     #Đúng
     def available_qty(self, obj):
