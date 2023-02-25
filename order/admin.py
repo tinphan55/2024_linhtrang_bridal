@@ -17,7 +17,7 @@ def convent_str_total_items(obj):
 class ClotheServiceInline(admin.StackedInline):
     form = ClotheServiceForm
     model= ClotheService
-    fields = ['clothe','qty','discount','delivery_date','return_date','total_items_']
+    fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_']
     readonly_fields = ['total_items_',]
     @admin.display(description='total_items_')
     def total_items_(self,obj):
@@ -116,7 +116,7 @@ class PhotoScheduleInline(admin.StackedInline):
 
 class MakeupServiceInline(admin.StackedInline):
     model =  MakeupService
-    fields = ['package','note','discount','total_items_']
+    fields = ['package','note','is_discount','total_items_']
     #raw_id_fields = ['product']
     readonly_fields = ['total_items_',]
     extra = 1
@@ -124,9 +124,9 @@ class MakeupServiceInline(admin.StackedInline):
     def total_items_(self,obj):
         return convent_str_total_items(obj, )
 
-class AccessoryServiceInline(admin.TabularInline):
+class AccessoryServiceInline(admin.StackedInline):
     model =  AccessorysSerive
-    fields = ['product','qty','discount','total_items_', 'delivery_date', 'return_date']
+    fields = ['product','qty','is_discount','total_items_', 'delivery_date', 'return_date']
     #raw_id_fields = ['product']
     readonly_fields = ['total_items_',]
     @admin.display(description='total_items_')
@@ -139,7 +139,7 @@ class AccessoryServiceInline(admin.TabularInline):
 
 class PhotoServiceInline(admin.StackedInline):
     model = PhotoService 
-    fields = ['package','discount','note','total_items_']
+    fields = ['package','is_discount','note','total_items_']
     readonly_fields = ['total_items_', ]
     extra = 1
     @admin.display(description='total_items_')

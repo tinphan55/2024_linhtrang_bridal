@@ -94,7 +94,8 @@ class CartItems(models.Model):
     created_at = models.DateTimeField(default=datetime.now)
     price = models.FloatField(blank=True, default=0)
     qty = models.IntegerField(default=1)
-    discount = models.IntegerField(null= True, blank=True, default=0)  
+    discount = models.IntegerField(null= True, blank=True, default=0)
+    is_discount = models.BooleanField(default=False)  
     total_items = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -120,6 +121,10 @@ class ClotheService(CartItems):
     
     def save(self, *args, **kwargs):
         self.price = Clothe.objects.get(id=self.clothe_id).price
+        if self.is_discount == True:
+            self.discount = Clothe.objects.get(id=self.clothe_id).discount
+        else:
+            self.discount = 0
         if self.delivery_date == None:
             self.delivery_date = self.cart.wedding_date - timedelta(days=2)
         if self.return_date == None:
@@ -136,6 +141,10 @@ class PhotoService(CartItems):
 
     def save(self, *args, **kwargs):
         self.price = Photo.objects.get(id=self.package_id).price
+        if self.is_discount == True:
+            self.discount = Photo.objects.get(id=self.package_id).discount
+        else:
+            self.discount = 0
         super(PhotoService, self).save(*args, **kwargs)
 
     
@@ -143,8 +152,13 @@ class MakeupService(CartItems):
     package = models.ForeignKey(Makeup, on_delete = models.CASCADE, 
         limit_choices_to={'is_available': True})
     note = models.TextField(max_length=500, null= True, blank=True)
+
     def save(self, *args, **kwargs):
         self.price = Makeup.objects.get(id=self.package_id).price
+        if self.is_discount == True:
+            self.discount = Makeup.objects.get(id=self.package_id).discount
+        else:
+            self.discount = 0
         super(MakeupService, self).save(*args, **kwargs)
     def __str__(self):
         return str(self.package)
@@ -160,8 +174,13 @@ class AccessorysSerive (CartItems):
     noti = models.CharField (max_length=200, null = True, blank=True)
     def __str__(self):
         return str(self.product)
+    
     def save(self, *args, **kwargs):
         self.price = Accessory.objects.get(id=self.product_id).price
+        if self.is_discount == True:
+            self.discount = Accessory.objects.get(id=self.product_id).discount
+        else:
+            self.discount = 0
         if self.delivery_date == None:
             self.delivery_date = self.cart.wedding_date - timedelta(days=2)
         if self.return_date == None:
