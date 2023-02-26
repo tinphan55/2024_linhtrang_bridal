@@ -16,6 +16,7 @@ class MemberInline(admin.StackedInline):
 class CustomUserAdmin(UserAdmin):
     inlines = (MemberInline, )
     list_display = ["image_tag","username","first_name", "last_name", "is_staff", "is_active"]
+    list_display_links = ["username",]
 
     def image_tag(self, obj):
         member = Member.objects.filter(id_member_id =obj.id).first()
