@@ -8,6 +8,7 @@ class Member(models.Model):
     lastname = models.CharField(max_length=255)
     phone = models.IntegerField(null=True)
     joined_date = models.DateField(null=True)
-    avatar = models.ImageField(upload_to='member/%Y/%m', null = True, blank=True,default = None)
+    avatar = models.ImageField(upload_to='member/', null = True, blank=True,default = None)
 
-    
+    def __str__(self):
+        return super().__str__()

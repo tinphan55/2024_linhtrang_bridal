@@ -63,10 +63,7 @@ class PhotoAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     readonly_fields =('category',)
     actions = [not_available]
-    # def image_tag(self, obj):
-    #     return format_html('<img src="{}" style="width: 50px; height:50px;"/>'.format(obj.images.url))
-
-    # image_tag.short_description = 'Image'
+    
 
 class MakeupAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):

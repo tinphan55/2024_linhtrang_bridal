@@ -108,7 +108,9 @@
 					<p>{{about_content}}</p>
 				</div>
 				<div class="col-md-4 col-sm-4 about-w3grids about-w3limg">
-					<img src="{%static 'frontend/images/img1.jpg' %}" class="img-responsive" alt=""/> 
+					{% if about_image %}
+					<img src="{{ MEDIA_URL }}{{about_image.url }}" class="img-responsive" alt=""/> 
+					{% endif %}
 				</div>
 				<div class="col-md-4 col-sm-4 about-w3grids about-w3right">
 					<h3 class="agileits-title">Khách hàng đánh giá </h3>
@@ -177,8 +179,9 @@
 			<div class="team-agileinfo agileits-w3layouts">
 				<div class="col-md-6 team-grid w3-agileits">
 					<div class="team-grid-right">
-						<img src="{%static 'frontend/images/t1.jpg' %}" alt=" " class="img-responsive" />
-					</div>
+						{% if staff1_image  %}
+						<img src="{{ MEDIA_URL }}{{ staff1_image.url }}" alt=" " class="img-responsive" />
+						{% endif %}					</div>
 					<div class="team-grid-left">
 						<h4>{{staff1_title}}</h4>
 						<p>{{staff1_content}}</p>
@@ -187,7 +190,9 @@
 				</div>
 				<div class="col-md-6 team-grid w3-agileits">
 					<div class="team-grid-right aliquam">
-						<img src="{%static 'frontend/images/t2.jpg'%}" alt=" " class="img-responsive" />
+						{% if staff2_image  %}
+						<img src="{{ MEDIA_URL }}{{ staff2_image.url }}" alt=" " class="img-responsive" />
+						{% endif %}
 					</div>
 					<div class="team-grid-left non">
 						<h4>{{staff2_title}}</h4>
@@ -200,7 +205,9 @@
 			<div class="team-agileinfo">
 				<div class="col-md-6 team-grid w3-agileits">
 					<div class="team-grid-right">
-						<img src="{%static 'frontend/images/t3.jpg' %}" alt=" " class="img-responsive" />
+						{% if staff3_image  %}
+						<img src="{{ MEDIA_URL }}{{ staff3_image.url }}" alt=" " class="img-responsive" />
+						{% endif %}
 					</div>
 					<div class="team-grid-left">
 						<h4>{{staff3_title}}</h4>
@@ -210,8 +217,9 @@
 				</div>
 				<div class="col-md-6 team-grid w3-agileits">
 					<div class="team-grid-right aliquam">
-						<img src="{%static 'frontend/images/t4.jpg' %}" alt=" " class="img-responsive" />
-					</div>
+						{% if staff4_image  %}
+						<img src="{{ MEDIA_URL }}{{ staff4_image.url }}" alt=" " class="img-responsive" />
+						{% endif %}					</div>
 					<div class="team-grid-left non">
 						<h4>{{staff4_title}}</h4>
 						<p>{{staff4_content}}</p>
@@ -238,7 +246,7 @@
 				<div class="filtr-container">
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="1" data-sort="Busy streets">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g1.jpg' %}" class="swipebox" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis maximus tortor diam, ac lobortis justo rutrum quis. Praesent non purus fermentum, eleifend velit non">
+							<a href="{%static 'frontend/images/g1.jpg' %}" class="swipebox" title="{{category1_content}}">
 								<img class="img-responsive " src="{%static 'frontend/images/g1.jpg' %}" alt=""  /> 
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -248,7 +256,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="2" data-sort="Luminous night">
 						<div class="agileits-img">
-							<a href="images/g2.jpg" class="swipebox" title="Duis maximus tortor diam, ac lobortis justo rutrum quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non purus fermentum, eleifend velit non">
+							<a href="images/g2.jpg" class="swipebox" title="{{category2_content}}">
 								<img src="{%static 'frontend/images/g2.jpg' %}" alt="" class="img-responsive" />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -258,7 +266,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="1" data-sort="City wonders">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g3.jpg' %}" class="swipebox" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis maximus tortor diam, ac lobortis justo rutrum quis. Praesent non purus fermentum, eleifend velit non">
+							<a href="{%static 'frontend/images/g3.jpg' %}" class="swipebox" title="{{category1_content}}">
 								<img src="{%static 'frontend/images/g3.jpg' %}" alt="" class="img-responsive" />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -268,7 +276,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="3" data-sort="Industrial site">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g4.jpg' %}" class="swipebox" title="Praesent non purus fermentum, eleifend velit non Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis maximus tortor diam, ac lobortis justo rutrum quis.">
+							<a href="{%static 'frontend/images/g4.jpg' %}" class="swipebox" title="{{category3_content}}">
 								<img src="{%static 'frontend/images/g4.jpg'%}" alt="" class="img-responsive " />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -278,7 +286,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="3" data-sort="In production">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g5.jpg' %}" class="swipebox" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis maximus tortor diam, ac lobortis justo rutrum quis. Praesent non purus fermentum, eleifend velit non">
+							<a href="{%static 'frontend/images/g5.jpg' %}" class="swipebox" title="{{category3_content}}">
 								<img src="{%static 'frontend/images/g5.jpg' %}" alt="" class="img-responsive" />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -288,7 +296,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="2" data-sort="Peaceful lake">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g6.jpg' %}" class="swipebox" title="Duis maximus tortor diam, ac lobortis justo rutrum quis. Praesent non purus fermentum, eleifend velit non">
+							<a href="{%static 'frontend/images/g6.jpg' %}" class="swipebox" title="{{category2_content}}">
 								<img src="{%static 'frontend/images/g6.jpg' %}" alt="" class="img-responsive" />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -298,7 +306,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="1" data-sort="Peaceful lake">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g7.jpg' %}" class="swipebox" title="Eleifend velit non duis maximus tortor diam, ac lobortis justo rutrum quis, praesent non purus fermentum. ">
+							<a href="{%static 'frontend/images/g7.jpg' %}" class="swipebox" title="{{category1_content}}">
 								<img src="{%static 'frontend/images/g7.jpg'%}" alt="" class="img-responsive" />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -308,7 +316,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="2" data-sort="Peaceful lake">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g3.jpg' %}" class="swipebox" title="Praesent non purus fermentum, eleifend velit non, Duis maximus tortor diam, ac lobortis justo rutrum quis.">
+							<a href="{%static 'frontend/images/g3.jpg' %}" class="swipebox" title="{{category2_content}}">
 								<img src="{%static 'frontend/images/g3.jpg' %}" alt="" class="img-responsive" />
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -318,7 +326,7 @@
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-6 filtr-item" data-category="3" data-sort="Peaceful lake">
 						<div class="agileits-img">
-							<a href="{%static 'frontend/images/g1.jpg'%}" class="swipebox" title="Ac lobortis justo rutrum quis. Praesent non purus fermentum, duis maximus tortor diam, eleifend velit non">
+							<a href="{%static 'frontend/images/g1.jpg'%}" class="swipebox" title="{{category3_content}}">
 								<img src="{%static 'frontend/images/g1.jpg' %}" alt="" class="img-responsive"/>
 								<div class="wthree-pcatn">
 									<h4>Our Portfolio</h4>  
@@ -406,9 +414,9 @@
 			<div class="testi-w3agileinfo"> 
 				<!-- Nav tabs -->
 				<ul class="nav nav-tabs" role="tablist">
-					<li role="presentation" class="active"><a href="#testi" aria-controls="testi" role="tab" data-toggle="tab"><img src= "{%static 'frontend/images/img2.jpg' %}" alt=""/></a></li>
-					<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab"><img src="{%static 'frontend/images/img3.jpg' %}" alt=""/></a></li>
-					<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab"><img src="{%static 'frontend/images/img4.jpg' %}" alt=""/></a></li>
+					<li role="presentation" class="active"><a href="#testi" aria-controls="testi" role="tab" data-toggle="tab"><img src= "{{ MEDIA_URL }}{{ com1_image.url }}" alt=""/></a></li>
+					<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab"><img src="{{ MEDIA_URL }}{{ com2_image.url }}" alt=""/></a></li>
+					<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab"><img src="{{ MEDIA_URL }}{{ com3_image.url }}" alt=""/></a></li>
 				</ul> 
 				<!-- Tab panes -->
 				<div class="tab-content">

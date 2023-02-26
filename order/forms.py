@@ -13,14 +13,14 @@ class CheckProductsForm(forms.Form):
         widget=forms.TextInput(attrs={
             'type': 'date',
         }),
-        initial=date.today(),
+        initial=date.today() + timedelta(days=30),
         required=True
     )
     end = forms.DateField(
         widget=forms.TextInput(attrs={
             'type': 'date',
         }),
-        initial=date.today() + timedelta(days=30),
+        initial=date.today() + timedelta(days=60),
         required=True
     )
 

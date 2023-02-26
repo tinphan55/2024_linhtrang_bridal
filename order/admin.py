@@ -1,13 +1,14 @@
 from django.utils.html import format_html
 from services_admin import *
 from django.contrib import admin
-from .models import *
+from order.models import *
 from django.db.models import  Sum
 from event_calendar.models import Event
 from datetime import datetime, timedelta, date
 from itertools import chain
-from .forms import *
+from order.forms import *
 from django.db.models import Q
+from members.models import Member
 
 
 def convent_str_total_items(obj):
@@ -214,7 +215,7 @@ def receivable_row(obj):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
+    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
     fields = ['user','client','wedding_date','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_']
     list_display_links=('client',)
     search_fields=('client__phone',)
@@ -223,7 +224,14 @@ class CartAdmin(admin.ModelAdmin):
     list_filter = ('created_at','user__username', 'client__full_name')
     inlines = [PaymentCartInline,ClotheServiceInline,PhotoServiceInline, MakeupServiceInline, AccessoryServiceInline,IncurredCartInline,PhotoScheduleInline]
     
+    def image_tag(self, obj):
+        member = Member.objects.filter(id_member_id =obj.user_id).first()
+        if member.avatar:
+            return format_html('<img src="{}" style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover;"/>'.format(member.avatar.url))
+        else:
+            return format_html('<img src="/media/member/default-image.jpg"style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover;"/>')                   
 
+    image_tag.short_description = 'avatar'
 
     @admin.display(description='total_cart')
     def total_cart(self, obj):

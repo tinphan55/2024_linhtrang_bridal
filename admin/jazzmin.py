@@ -15,8 +15,7 @@ JAZZMIN_SETTINGS = {
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
     "site_icon": "/bills/img/logo.png",
     "site_logo": "/bills/img/logo.png",
-    # "custom_css": "css/custom.css",
-    # "user_avatar": "Member.avatar",
+
 
     # Welcome text on the login screen
     "welcome_sign": "Welcome to Linh Trang - Bridal",
