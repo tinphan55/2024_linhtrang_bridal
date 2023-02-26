@@ -7,29 +7,24 @@ from django.utils.translation import gettext_lazy as _
 
 today = date.today()
 
-
-
 class CheckProductsForm(forms.Form):
     code = forms.CharField()
     start = forms.DateField(
         widget=forms.TextInput(attrs={
             'type': 'date',
-            #'input_formats': ['%d-%m-%Y'],
-            #'placeholder': 'dd-mm-yyyy'
         }),
-        #initial=datetime.today().strftime('%d-%m-%Y'),
+        initial=date.today(),
         required=True
-    
     )
     end = forms.DateField(
         widget=forms.TextInput(attrs={
             'type': 'date',
-            #'input_formats': ['%d-%m-%Y'],
-            #'placeholder': 'dd-mm-yyyy'
         }),
-        #initial=datetime.today().strftime('%d-%m-%Y'),
+        initial=date.today() + timedelta(days=30),
         required=True
     )
+
+
 
 
 
@@ -44,7 +39,7 @@ class CartForm(ModelForm):
 
 class IncurredCartForm(ModelForm):
     class Meta:
-        models = Cart  
+        models = IncurredCart
         fields = ('amount','description','created_at')
         help_texts = {
             'amount': _('Phát sinh: Nếu phát sinh tăng thì nhập dương, phát sinh giảm thì nhập âm "-"'),
@@ -67,18 +62,3 @@ class IncurredCartForm(ModelForm):
         help_texts = {
             'amount': _('Phát sinh: Nếu phát sinh tăng thì nhập dương, phát sinh giảm thì nhập âm "-"'),
             'description': _('Mô tả chi tiết về sự kiện phát sinh')  }
-# 
-# cart_instance = Cart.objects.get(pk=1)
-# form = CartForm (initial={'note': 'test'}, instance= cart_instance)
-
-
-
-# class CartComboForm(ModelForm):
-#     class Meta:
-#         model = CartCombo
-#         fields = ['name', 'clothe']
-
-# class CartComboForm(forms.Form): 
-#     name = forms.CharField(max_length=100)
-#     clothe = forms.ModelMultipleChoiceField(queryset= Clothe.objects.all())
-    

@@ -24,6 +24,7 @@ class Ranking (models.Model):
     type = models.CharField(max_length=20, null=True, blank=True)
     description = models.CharField(max_length= 100, null=True, blank=True)
     price = models.IntegerField(default=0)
+    discount = models.IntegerField(default=0)
     
     
     def __str__(self):
@@ -34,7 +35,8 @@ class ItemBase (models.Model):
     description = models.TextField(max_length=500, blank=True)
     ranking = models.ForeignKey(Ranking,on_delete=models.CASCADE, blank=True, null=True )
     price = models.IntegerField(default=0)
-    images = models.ImageField(upload_to='photos/products', default='', blank=True)
+    discount = models.IntegerField(default=0)
+    images = models.ImageField(upload_to='services_admin', default='', blank=True)
     is_available = models.BooleanField(default=True)   
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -60,8 +62,8 @@ class Clothe(ItemBase):
         return self.code
     
     def save(self, *args, **kwargs):
-        #self.category = Ranking.objects.get(id=self.ranking_id).category
         self.price = Ranking.objects.get(id=self.ranking_id).price
+        self.discount = Ranking.objects.get(id=self.ranking_id).discount
         super(ItemBase, self).save(*args, **kwargs)
     
 
@@ -93,6 +95,7 @@ class Accessory(models.Model):
     qty = models.IntegerField(null=False)
     description = models.TextField(max_length=500, blank=True)
     price = models.IntegerField(default=0)
+    discount = models.IntegerField(default=0)
     is_available = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=4)
     created_date = models.DateTimeField(auto_now_add=True)

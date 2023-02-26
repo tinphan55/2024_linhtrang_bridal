@@ -2,7 +2,7 @@ JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Shop Admin",
       # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Library",
+    "site_header": "Linh Trang",
      # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "LINH TRANG BRIDAL",
 
@@ -13,7 +13,10 @@ JAZZMIN_SETTINGS = {
     "site_logo_classes": "img-circle",
 
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
-    "site_icon": None,
+    "site_icon": "/bills/img/logo.png",
+    "site_logo": "/bills/img/logo.png",
+    # "custom_css": "css/custom.css",
+    # "user_avatar": "Member.avatar",
 
     # Welcome text on the login screen
     "welcome_sign": "Welcome to Linh Trang - Bridal",
@@ -38,13 +41,15 @@ JAZZMIN_SETTINGS = {
 
         # Url that gets reversed (Permissions can be added)
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
-
         # external url that opens in a new window (Permissions can be added)
         {"name": "Check Clothes", "url": "http://linhtrangbridal.online/checkproducts/", "new_window": True},
         {"name": "Calendar", "url":"http://linhtrangbridal.online/calendar/", "new_window": True},
-
+       
+    
         # model admin to link to (Permissions checked against model)
         {"model": "order.Cart"},
+
+        
 
         # App with dropdown menu to all its models pages (Permissions checked against models)
         # {"model": "order.Cart"},
@@ -57,7 +62,7 @@ JAZZMIN_SETTINGS = {
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
        # {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
-        {"model": "auth.user"}
+        #{"model": "auth.user"}
     ],
 
     #############
@@ -77,7 +82,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": [ "order","bills","clients","services_admin","event_calendar","auth",],
+    "order_with_respect_to": [ "order","bills","report","services_admin","clients","event_calendar","auth",],
 
     # Custom links to append to app groups, keyed on app name
     # "custom_links": {
@@ -106,11 +111,11 @@ JAZZMIN_SETTINGS = {
         "services_admin.ranking": "fas fa-star",
         "services_admin.Tag":"fas fa-tags",
         "services_admin.VolatilityAccessory":"fas fa-warehouse",
-        
         "services_admin.ComboItem":"far fa-object-group",
         "clients.Client":"fas fa-male",
         "bills.Bill" : "fas fa-receipt",
-        "event_calendar.Event":"far fa-calendar-check"
+        "event_calendar.Event":"far fa-calendar-check",
+        "report.Report":"fas fa-flag-checkered" ,
     
 
 
@@ -155,28 +160,60 @@ JAZZMIN_SETTINGS = {
    
 }
 
+# JAZZMIN_UI_TWEAKS = {
+#     "navbar_small_text": False,
+#     "footer_small_text": False,
+#     "body_small_text": True,
+#     "brand_small_text": False,
+#     "brand_colour": False,
+#     "accent": "accent-primary",
+#     "navbar": "navbar-white navbar-light",
+#     "no_navbar_border": False,
+#     "navbar_fixed": True,
+#     "layout_boxed": False,
+#     "footer_fixed": False,
+#     "sidebar_fixed": True,
+#     "sidebar": "sidebar-dark-primary",
+#     "sidebar_nav_small_text": False,
+#     "sidebar_disable_expand": False,
+#     "sidebar_nav_child_indent": False,
+#     "sidebar_nav_compact_style": False,
+#     "sidebar_nav_legacy_style": False,
+#     "sidebar_nav_flat_style": True,
+#     "theme": "default",
+#     "dark_mode_theme": None,
+#     "button_classes": {
+#         "primary": "btn-primary",
+#         "secondary": "btn-secondary",
+#         "info": "btn-info",
+#         "warning": "btn-warning",
+#         "danger": "btn-danger",
+#         "success": "btn-success"
+#     }
+# }
+
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": True,
     "brand_small_text": False,
-    "brand_colour": False,
-    "accent": "accent-primary",
-    "navbar": "navbar-white navbar-light",
+    "brand_colour": "navbar-indigo",
+    "accent": "accent-orange",
+    "navbar": "navbar-light",
     "no_navbar_border": False,
     "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary",
+    "sidebar": "sidebar-light-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,
     "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": True,
-    "theme": "default",
-    "dark_mode_theme": None,
+    "sidebar_nav_legacy_style": True,
+    "sidebar_nav_flat_style": False,
+    "theme": "solar",
+    "dark_mode_theme": "superhero",
     "button_classes": {
         "primary": "btn-primary",
         "secondary": "btn-secondary",

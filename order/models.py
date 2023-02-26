@@ -41,51 +41,51 @@ class Cart(models.Model):
         return self.id
 
         
-    def save(self, *args, **kwargs):
-        clothe = ClotheService.objects.filter(cart_id =self.id )
-        total = clothe.aggregate(total=Sum('total_items'))
-        total_price = total['total']
-        if total_price == None:
-            total_clothe = 0
-        else:
-            total_clothe = total_price
+    # def save(self, *args, **kwargs):
+    #     clothe = ClotheService.objects.filter(cart_id =self.id )
+    #     total = clothe.aggregate(total=Sum('total_items'))
+    #     total_price = total['total']
+    #     if total_price == None:
+    #         total_clothe = 0
+    #     else:
+    #         total_clothe = total_price
         
-        items_photo = Cart.objects.annotate(total= Sum(F('photoservice__total_items'))).filter(pk=self.pk).values()
-        if items_photo.count() ==0:
-            total_photo = 0
-        else:
-            total_photo= items_photo[0]['total'] or 0
+    #     items_photo = Cart.objects.annotate(total= Sum(F('photoservice__total_items'))).filter(pk=self.pk).values()
+    #     if items_photo.count() ==0:
+    #         total_photo = 0
+    #     else:
+    #         total_photo= items_photo[0]['total'] or 0
         
         
-        items_makeup = Cart.objects.annotate(total= Sum(F('makeupservice__total_items'))).filter(pk=self.pk).values()
-        if items_makeup.count() ==0:
-            total_makecup = 0
-        else:
-            total_makecup = items_makeup[0]['total'] or 0
+    #     items_makeup = Cart.objects.annotate(total= Sum(F('makeupservice__total_items'))).filter(pk=self.pk).values()
+    #     if items_makeup.count() ==0:
+    #         total_makecup = 0
+    #     else:
+    #         total_makecup = items_makeup[0]['total'] or 0
         
-        items_accessory = Cart.objects.annotate(total= Sum(F('accessorysserive__total_items'))).filter(pk=self.pk).values()
-        if items_accessory.count()==0:
-            total_accessory = 0
-        else:
-            total_accessory = items_accessory[0]['total'] or 0
-        total =  total_clothe + total_photo + total_makecup + total_accessory
-        self.total_price = total 
+    #     items_accessory = Cart.objects.annotate(total= Sum(F('accessorysserive__total_items'))).filter(pk=self.pk).values()
+    #     if items_accessory.count()==0:
+    #         total_accessory = 0
+    #     else:
+    #         total_accessory = items_accessory[0]['total'] or 0
+    #     total =  total_clothe + total_photo + total_makecup + total_accessory
+    #     self.total_price = total 
 
-        items_incurred = Cart.objects.annotate(total= Sum(F('incurredcart__amount'))).filter(id=self.id).values()
-        if items_incurred.count() ==0:
-            self.incurred = 0
-        else:
-            self.incurred = items_incurred[0]['total'] or 0
-        self.total_bill = self.total_price + self.incurred
+    #     items_incurred = Cart.objects.annotate(total= Sum(F('incurredcart__amount'))).filter(id=self.id).values()
+    #     if items_incurred.count() ==0:
+    #         self.incurred = 0
+    #     else:
+    #         self.incurred = items_incurred[0]['total'] or 0
+    #     self.total_bill = self.total_price + self.incurred
 
-        items_payment = Cart.objects.annotate(total= Sum(F('paymentschedulecart__amount'))).filter(id=self.id).values()
-        if items_payment.count() ==0:
-            self.paid = 0
-        else:
-            self.paid = items_payment[0]['total'] or 0
-        self.receivable = self.total_bill - self.paid
+    #     items_payment = Cart.objects.annotate(total= Sum(F('paymentschedulecart__amount'))).filter(id=self.id).values()
+    #     if items_payment.count() ==0:
+    #         self.paid = 0
+    #     else:
+    #         self.paid = items_payment[0]['total'] or 0
+    #     self.receivable = self.total_bill - self.paid
         
-        super(Cart, self).save(*args, **kwargs)
+    #     super(Cart, self).save(*args, **kwargs)
 
 class CartItems(models.Model):
     class Meta:
@@ -94,7 +94,8 @@ class CartItems(models.Model):
     created_at = models.DateTimeField(default=datetime.now)
     price = models.FloatField(blank=True, default=0)
     qty = models.IntegerField(default=1)
-    discount = models.IntegerField(null= True, blank=True, default=0)  
+    discount = models.IntegerField(null= True, blank=True, default=0)
+    is_discount = models.BooleanField(default=False)  
     total_items = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -120,6 +121,10 @@ class ClotheService(CartItems):
     
     def save(self, *args, **kwargs):
         self.price = Clothe.objects.get(id=self.clothe_id).price
+        if self.is_discount == True:
+            self.discount = Clothe.objects.get(id=self.clothe_id).discount
+        else:
+            self.discount = 0
         if self.delivery_date == None:
             self.delivery_date = self.cart.wedding_date - timedelta(days=2)
         if self.return_date == None:
@@ -136,6 +141,10 @@ class PhotoService(CartItems):
 
     def save(self, *args, **kwargs):
         self.price = Photo.objects.get(id=self.package_id).price
+        if self.is_discount == True:
+            self.discount = Photo.objects.get(id=self.package_id).discount
+        else:
+            self.discount = 0
         super(PhotoService, self).save(*args, **kwargs)
 
     
@@ -143,8 +152,13 @@ class MakeupService(CartItems):
     package = models.ForeignKey(Makeup, on_delete = models.CASCADE, 
         limit_choices_to={'is_available': True})
     note = models.TextField(max_length=500, null= True, blank=True)
+
     def save(self, *args, **kwargs):
         self.price = Makeup.objects.get(id=self.package_id).price
+        if self.is_discount == True:
+            self.discount = Makeup.objects.get(id=self.package_id).discount
+        else:
+            self.discount = 0
         super(MakeupService, self).save(*args, **kwargs)
     def __str__(self):
         return str(self.package)
@@ -160,8 +174,13 @@ class AccessorysSerive (CartItems):
     noti = models.CharField (max_length=200, null = True, blank=True)
     def __str__(self):
         return str(self.product)
+    
     def save(self, *args, **kwargs):
         self.price = Accessory.objects.get(id=self.product_id).price
+        if self.is_discount == True:
+            self.discount = Accessory.objects.get(id=self.product_id).discount
+        else:
+            self.discount = 0
         if self.delivery_date == None:
             self.delivery_date = self.cart.wedding_date - timedelta(days=2)
         if self.return_date == None:
