@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -58,14 +60,20 @@ class Clothe(ItemBase):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     qty = models.IntegerField(null=False, default=1)
     code = models.CharField(max_length=10,null=False, blank=False, unique=True)
+    
     def __str__(self):
         return self.code
     
     def save(self, *args, **kwargs):
-        self.price = Ranking.objects.get(id=self.ranking_id).price
-        self.discount = Ranking.objects.get(id=self.ranking_id).discount
+        self.price = self.ranking.price
+        self.discount = self.ranking.discount
         super(ItemBase, self).save(*args, **kwargs)
-    
+
+@receiver(post_save, sender=Ranking)
+def update_clothes(sender, instance, **kwargs):
+    items = Clothe.objects.filter(ranking=instance)
+    for item in items:
+        item.save()
 
 class Photo(ItemBase):  
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=2)

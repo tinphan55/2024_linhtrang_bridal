@@ -120,9 +120,9 @@ class ClotheService(CartItems):
         return str(self.clothe)
     
     def save(self, *args, **kwargs):
-        self.price = Clothe.objects.get(id=self.clothe_id).price
+        self.price = self.clothe.price
         if self.is_discount == True:
-            self.discount = Clothe.objects.get(id=self.clothe_id).discount
+            self.discount = self.clothe.ranking.discount
         else:
             self.discount = 0
         if self.delivery_date == None:
@@ -140,9 +140,9 @@ class PhotoService(CartItems):
         return str(self.package)
 
     def save(self, *args, **kwargs):
-        self.price = Photo.objects.get(id=self.package_id).price
+        self.price = self.package.price
         if self.is_discount == True:
-            self.discount = Photo.objects.get(id=self.package_id).discount
+            self.discount = self.package.discount
         else:
             self.discount = 0
         super(PhotoService, self).save(*args, **kwargs)
@@ -154,9 +154,9 @@ class MakeupService(CartItems):
     note = models.TextField(max_length=500, null= True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.price = Makeup.objects.get(id=self.package_id).price
+        self.price = self.package.price
         if self.is_discount == True:
-            self.discount = Makeup.objects.get(id=self.package_id).discount
+             self.discount = self.package.discount
         else:
             self.discount = 0
         super(MakeupService, self).save(*args, **kwargs)
@@ -176,9 +176,9 @@ class AccessorysSerive (CartItems):
         return str(self.product)
     
     def save(self, *args, **kwargs):
-        self.price = Accessory.objects.get(id=self.product_id).price
+        self.price = self.product.price
         if self.is_discount == True:
-            self.discount = Accessory.objects.get(id=self.product_id).discount
+             self.discount = self.product.discount
         else:
             self.discount = 0
         if self.delivery_date == None:
@@ -186,9 +186,6 @@ class AccessorysSerive (CartItems):
         if self.return_date == None:
             self.return_date = self.cart.wedding_date + timedelta(days=2) 
         today = date.today()
-       
-        # if self.is_returned == False and today > self.return_date:
-        #     self.noti = str('Thu hồi đồ cưới, đã trễ hẹn. Ngày thu hồi') + str(self.return_date)
         super(AccessorysSerive, self).save(*args, **kwargs)
     
 class IncurredCart(models.Model):

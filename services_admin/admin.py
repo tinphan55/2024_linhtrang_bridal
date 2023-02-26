@@ -105,14 +105,6 @@ class AccessoryAdmin(admin.ModelAdmin):
     
 
 
-
-
-
-
-   
-# class VolatilityAccessoryAdmin(admin.ModelAdmin):
-#     pass
-
 class RankingAdmin(admin.ModelAdmin):
     list_display = ('id','rank','type','price','discount', 'category', 'description')
     list_display_links = ('id', 'rank')
