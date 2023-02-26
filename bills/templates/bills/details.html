@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title> bill:{{ code }}- {{ cart.client.full_name }}</title>
+    <title> bill:{{ code }}_{{ cart.client.full_name }}</title>
     <link rel="stylesheet" href="{%static 'bills/css/style.css' %}" media="all" /> 
 
   </head>
@@ -25,6 +25,7 @@
           <div class="to">KHÁCH HÀNG:</div>
           <h2 class="name">{{ cart.client.full_name }}</h2>
           <div class="address">{{ cart.client.address }}</div>
+          <div class="phone">0{{ cart.client.phone }}</div>
           <div class="email"><a href="mailto:{{ customer_email }}">{{ customer_email }}</a></div>
         </div>
         <div id="invoice">
@@ -79,7 +80,7 @@
             {% if date_makup.start_time %}
               {{date_makup.start_time}} , kết thúc lúc {{date_makup.end_time}}
             {% else %}
-               ........................,kết thúc lúc......................
+               ........................, kết thúc lúc......................
             {% endif %}
              </h4>
           <thead>
@@ -97,7 +98,7 @@
                 {% for item in makeup %}
                   <tr>
                     <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-                    <td class="desc">{{ item.package.name }}, Gói {% if item.package.re_makup %} có {% else %} không {% endif %} bao gồm dặm lại</td>
+                    <td class="desc">{{ item.package.name }}, Gói {% if item.package.re_makup %} có {% else %} không {% endif %} bao gồm dặm lại.</td>
                     <td class="unit">{{ item.price }}</td>
                     <td class="qty">{{ item.qty }}</td>
                     <td class="total">{{ item.discount }}</td>
@@ -133,9 +134,10 @@
                 {% for item in photo %}
                   <tr>
                     <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-                    <td class="desc">Có {{ item.package.number_location }} điểm chụp, {{ item.package.number_gate_photo }} hình cổng
-                      {{ item.package.number_small_photo }} hình nhỏ, {{ item.package.origin_file }} file gốc,  {{ item.package.edit_file }} file chỉnh sửa, 
-                      {% if item.package.is_album %} và có album {% else %} và không có album {% endif %} </td>
+                    <td class="desc">Có {{ item.package.number_location }} điểm chụp, {{ item.package.number_gate_photo }} hình cổng 
+                      , {{ item.package.small_photo }} hình nhỏ,<br>
+                      {{ item.package.origin_file }} file gốc,  {{ item.package.edit_file }} file chỉnh sửa 
+                      {% if item.package.is_album %} và có album {% else %} và không có album. {% endif %} </td>
                     <td class="unit">{{ item.price }}</td>
                     <td class="qty">{{ item.qty }}</td>
                     <td class="total">{{ item.discount }}</td>
