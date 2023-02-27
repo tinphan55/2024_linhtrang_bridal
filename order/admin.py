@@ -25,89 +25,75 @@ class ClotheServiceInline(admin.StackedInline):
         return convent_str_total_items(obj, )
     
 @admin.action(description='Xác nhận sản phẩm được trả')
-def returned (modeladmin, request, queryset):
-    for ReturnClothe in queryset:
-        if ReturnClothe.is_returned == False:
-            queryset.update(is_returned = True )
-            queryset.update(returned_at = datetime.now())
-        elif ReturnAccessory.is_returned == False:
-            queryset.update(is_returned = True )
-            queryset.update(returned_at = datetime.now())
+def confirm_returned(modeladmin, request, queryset):
+    for return_item in queryset:
+        if not return_item.is_returned:
+            return_item.is_returned = True
+            return_item.returned_at = datetime.now()
+            return_item.save()
     
+@admin.action(description='Hủy trả sản phẩm')
+def confirm_not_returned(modeladmin, request, queryset):
+    for return_item in queryset:
+        if return_item.is_returned:
+            return_item.is_returned = False
+            return_item.returned_at = None
+            return_item.save()
 
-@admin.action(description='Hủy trả sản phẩm')   
-def not_return (modeladmin, request, queryset):
-    queryset.update(is_returned = False )
-    queryset.update(returned_at = None)
 
+class ItemStatusFilter(admin.SimpleListFilter):
+    title = 'Item Status'
+    parameter_name = 'item_status'
 
+    def lookups(self, request, model_admin):
+        return (
+            ('Chờ cho thuê', 'Chờ cho thuê'),
+            ('Đang cho thuê', 'Đang cho thuê'),
+            ('Quá hạn thuê', 'Quá hạn thuê'),
+            ('Đã thu hồi', 'Đã thu hồi'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Chờ cho thuê':
+            return queryset.filter(delivery_date__gt=date.today())
+        elif self.value() == 'Đang cho thuê':
+            return queryset.filter(delivery_date__lte=date.today(), returned_at__isnull=True, return_date__gte=date.today())
+        elif self.value() == 'Quá hạn thuê':
+            return queryset.filter(delivery_date__lte=date.today(), returned_at__isnull=True, return_date__lt=date.today())
+        elif self.value() == 'Đã thu hồi':
+            return queryset.filter(returned_at__isnull=False)
 
 class ReturnClotheAdmin(admin.ModelAdmin):
     def clothe_id(self, obj):
         return obj.clothe.id
     model = ReturnClothe
-    list_display = ('cart','clothe','get_color','qty' ,'delivery_date', 'return_date', 'status', 'returned_at' )
-    fields = ['clothe','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
-    readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','status','returned_at', 'noti']
+    list_display = ('cart','clothe','get_color','qty' ,'delivery_date', 'return_date', 'item_status', 'returned_at' )
+    fields = ['clothe','qty', 'delivery_date', 'return_date', 'is_returned',  'returned_at','note']
+    readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','item_status','is_returned', 'returned_at',]
     list_display_links = ('clothe',)
-    list_filter =  ('is_returned','cart__wedding_date' )
+    list_filter =  ('is_returned','cart__wedding_date' ,ItemStatusFilter)
     search_fields = ( 'cart__client__phone', 'cart__id', 'clothe__code')
-    actions = [returned, not_return]
+    actions = [confirm_returned, confirm_not_returned]
     admin.site.disable_action('delete_selected')
     @admin.display(description='color_')
     def get_color(self, obj):
         return obj.clothe.color
-    def status(self, obj):
-        today = date.today()
-        if today < obj.delivery_date:
-            status = "Chờ cho thuê"
-        elif today >= obj.delivery_date and obj.returned_at == None:
-            if  today <= obj.return_date:
-                status = "Đang cho thuê"
-            elif today > obj.return_date:
-                num_date = today - obj.return_date
-                status = str("Quá hạn thuê ") + str(num_date.days)+str(" ngày")
-        else:
-            status = "Đã thu hồi"
-        return status
+    
+
     
 class ReturnAccessoryAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.filter(product__is_sell=False)
     model = ReturnAccessory
-    list_display = ('cart','product','qty' ,'delivery_date', 'return_date', 'status', 'returned_at' )
-    fields = ['product','noti','qty', 'delivery_date', 'return_date', 'is_returned', 'note', 'returned_at' ]
-    readonly_fields = ['product','qty', 'delivery_date', 'return_date','status','returned_at', 'noti']
+    list_display = ('cart','product','qty' ,'delivery_date', 'return_date', 'item_status', 'returned_at' )
+    fields = ['product','qty', 'delivery_date', 'return_date',  'returned_at','note', ]
+    readonly_fields = ['product','qty', 'delivery_date', 'return_date','returned_at',]
     list_display_links = ('product',)
-    list_filter =  ('is_returned','cart__wedding_date' )
+    list_filter =  ('is_returned','cart__wedding_date' , ItemStatusFilter)
     search_fields = ( 'cart__client__phone', 'cart__id', 'product__name')
-    actions = [returned, not_return]
-    #admin.site.disable_action('delete_selected')
-    def status(self, obj):
-        today = date.today()
-        if obj.delivery_date == None and obj.return_date == None :
-            obj.delivery_date = today
-            obj.return_date = today
-        else:
-            obj.delivery_date = obj.delivery_date
-            obj.return_date =  obj.return_date
-        if today < obj.delivery_date:
-            status = "Chờ cho thuê"
-        elif today >= obj.delivery_date and obj.returned_at == None:
-            if  today <= obj.return_date:
-                status = "Đang cho thuê"
-            elif today > obj.return_date:
-                num_date = today - obj.return_date
-                status = str("Quá hạn thuê ") + str(num_date.days)+str(" ngày")
-        else:
-            status = "Đã thu hồi"
-        return status
-    
-
-    
- 
-    
+    actions = [confirm_returned, confirm_not_returned]
+   
 
 class PhotoScheduleInline(admin.StackedInline):
     model =  Event 

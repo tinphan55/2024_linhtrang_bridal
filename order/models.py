@@ -129,8 +129,23 @@ class ClotheService(CartItems):
             self.delivery_date = self.cart.wedding_date - timedelta(days=2)
         if self.return_date == None:
             self.return_date = self.cart.wedding_date + timedelta(days=2) 
-       
         super(ClotheService, self).save(*args, **kwargs)
+    
+    @property
+    def item_status(self):
+        today = date.today()
+        if today < self.delivery_date:
+            status = "Chờ cho thuê"
+        elif today >= self.delivery_date and self.returned_at is None:
+            if today <= self.return_date:
+                status = "Đang cho thuê"
+            elif today > self.return_date:
+                num_date = today - self.return_date
+                status = f"Quá hạn thuê {num_date.days} ngày"
+        else:
+            status = "Đã thu hồi"
+        return status
+    
 
 class PhotoService(CartItems):
     package = models.ForeignKey(Photo, on_delete = models.CASCADE, 
@@ -188,6 +203,21 @@ class AccessorysSerive (CartItems):
         today = date.today()
         super(AccessorysSerive, self).save(*args, **kwargs)
     
+    @property
+    def item_status(self):
+        today = date.today()
+        if today < self.delivery_date:
+            status = "Chờ cho thuê"
+        elif today >= self.delivery_date and self.returned_at is None:
+            if today <= self.return_date:
+                status = "Đang cho thuê"
+            elif today > self.return_date:
+                num_date = today - self.return_date
+                status = f"Quá hạn thuê {num_date.days} ngày"
+        else:
+            status = "Đã thu hồi"
+        return status
+    
 class IncurredCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
     description = models.TextField(max_length=500, null=False)
@@ -206,12 +236,14 @@ class PaymentScheduleCart(models.Model):
         return str(self.cart)
     
 
-class ReturnClothe (ClotheService):
+class ReturnClothe(ClotheService):
     class Meta:
         proxy = True
-    
+
     def __str__(self):
         return str(self.clothe.code)
+    
+    
         
 
 class ReturnAccessory (AccessorysSerive):
