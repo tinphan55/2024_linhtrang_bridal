@@ -116,7 +116,7 @@ class CartItems(models.Model):
         return '{:,.0f}'.format( discount)
     @property
     def str_total_items(self):
-        total_items = self.total_items
+        total_items = self.total_items - self.discount
         return '{:,.0f}'.format( total_items)
 
 
