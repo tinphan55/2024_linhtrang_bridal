@@ -122,7 +122,7 @@ class ClotheService(CartItems):
     def save(self, *args, **kwargs):
         self.price = self.clothe.price
         if self.is_discount == True:
-            self.discount = self.clothe.ranking.discount
+            self.discount = self.clothe.ranking.discount * self.qty
         else:
             self.discount = 0
         if self.delivery_date == None:
@@ -157,7 +157,7 @@ class PhotoService(CartItems):
     def save(self, *args, **kwargs):
         self.price = self.package.price
         if self.is_discount == True:
-            self.discount = self.package.discount
+            self.discount = self.package.discount* self.qty
         else:
             self.discount = 0
         super(PhotoService, self).save(*args, **kwargs)
@@ -171,7 +171,7 @@ class MakeupService(CartItems):
     def save(self, *args, **kwargs):
         self.price = self.package.price
         if self.is_discount == True:
-             self.discount = self.package.discount
+             self.discount = self.package.discount* self.qty
         else:
             self.discount = 0
         super(MakeupService, self).save(*args, **kwargs)
@@ -193,7 +193,7 @@ class AccessorysSerive (CartItems):
     def save(self, *args, **kwargs):
         self.price = self.product.price
         if self.is_discount == True:
-             self.discount = self.product.discount
+             self.discount = self.product.discount * self.qty
         else:
             self.discount = 0
         if self.delivery_date == None:
