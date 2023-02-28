@@ -90,6 +90,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   margin-bottom: 20px;
+  
 }
 
 table th,
@@ -118,8 +119,9 @@ table td h3{
 
 table .no {
   color: #FFFFFF;
-  font-size: 1.6em;
+  font-size: 1.5em;
   background: #57B223;
+  text-align: left;
 }
 
 table .desc {
