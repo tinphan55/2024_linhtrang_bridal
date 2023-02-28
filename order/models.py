@@ -106,6 +106,21 @@ class CartItems(models.Model):
             self.total_items = total_items
         super(CartItems, self).save(*args, **kwargs)
     
+    @property
+    def str_price(self):
+        price = self.price
+        return '{:,.0f}'.format(price)
+    @property
+    def str_discount(self):
+        discount = self.discount
+        return '{:,.0f}'.format( discount)
+    @property
+    def str_total_items(self):
+        total_items = self.total_items
+        return '{:,.0f}'.format( total_items)
+
+
+    
 class ClotheService(CartItems):
     clothe = models.ForeignKey(Clothe, on_delete = models.CASCADE,
      limit_choices_to={'is_available': True})

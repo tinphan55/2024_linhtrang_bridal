@@ -44,11 +44,12 @@
           {% endif %} </h4>
           <thead>
             <tr>
-              <th class="no">#</th>
-              <th class="desc">DỊCH VỤ</th>
-              <th class="unit">GIÁ THUÊ LẺ</th>
-              <th class="qty">SỐ LƯỢNG</th>
-              <th class="total">GIẢM GIÁ</th>
+              <th class="no">DỊCH VỤ</th>
+              <th class="qty">GIÁ THUÊ LẺ</th>
+              <th class="unit">SỐ LƯỢNG</th>
+              <th class="qty">GIẢM GIÁ</th>
+              <th class="total">GIÁ SAU GIẢM</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -56,17 +57,26 @@
               {% if clothe %}
                 {% for item in clothe %}
                   <tr>
-                    <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-                    <td class="desc">
+                    <td class="no">
                       {% if item.clothe.code %}
-                        {{ item.clothe.code }}, {{ item.clothe.name }}
-                      {% else %}
-                        {{ item.product.name }}
-                      {% endif %}</td>
+                      {{ item.clothe.code }}, {{ item.clothe.name }}
+                    {% else %}
+                      {{ item.product.name }}
+                    {% endif %}
+                    </td>
+                    <td class="qty">
+                      {{ item.str_price }} 
+                    </td>
                  
-                    <td class="unit">{{ item.price }}</td>
-                    <td class="qty">{{ item.qty }}</td>
-                    <td class="total">{{ item.discount }}</td>
+                    <td class="unit">
+                      {{ item.qty }}
+                    </td>
+                    <td class="qty">
+                      {{ item.str_discount }}
+                    </td>
+                    <td class="total">
+                      {{ item.str_total_items}}
+                    </td>
                   </tr>
                 {% endfor %}
               {% endif %}
@@ -85,11 +95,11 @@
              </h4>
           <thead>
             <tr>
-              <th class="no">#</th>
-              <th class="desc">DỊCH VỤ</th>
-              <th class="unit">GIÁ TIỀN</th>
-              <th class="qty">SỐ LƯỢNG</th>
-              <th class="total">GIẢM GIÁ</th>
+              <th class="no">DỊCH VỤ</th>
+              <th class="desc">GIÁ THUÊ LẺ</th>
+              <th class="unit">SỐ LƯỢNG</th>
+              <th class="qty">GIẢM GIÁ</th>
+              <th class="total">GIÁ SAU GIẢM</th>
             </tr>
           </thead>
           <tbody>
@@ -97,11 +107,12 @@
               {% if makeup %}
                 {% for item in makeup %}
                   <tr>
-                    <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-                    <td class="desc">{{ item.package.name }}, Gói {% if item.package.re_makup %} có {% else %} không {% endif %} bao gồm dặm lại.</td>
-                    <td class="unit">{{ item.price }}</td>
-                    <td class="qty">{{ item.qty }}</td>
-                    <td class="total">{{ item.discount }}</td>
+                    <td class="no">{{ item.package.name }}, <br>
+                      Gói {% if item.package.re_makup %} có {% else %} không {% endif %} bao gồm dặm lại.</td>
+                    <td class="qty">{{ item.str_price }}</td>
+                    <td class="unit">{{ item.qty }}</td>
+                    <td class="qty">{{ item.str_discount }}</td>
+                    <td class="total"> {{ item.str_total_items}}</td>
                   </tr>
                 {% endfor %}
               {% endif %}
@@ -121,11 +132,11 @@
             {% endif %} </h4>
           <thead>
             <tr>
-              <th class="no">#</th>
-              <th class="desc">DỊCH VỤ</th>
-              <th class="unit">GIÁ CHỤP</th>
-              <th class="qty">SỐ LƯỢNG</th>
-              <th class="total">GIẢM GIÁ</th>
+              <th class="no">DỊCH VỤ</th>
+              <th class="desc">GIÁ THUÊ LẺ</th>
+              <th class="unit">SỐ LƯỢNG</th>
+              <th class="qty">GIẢM GIÁ</th>
+              <th class="total">GIÁ SAU GIẢM</th>
             </tr>
           </thead>
           <tbody>
@@ -133,16 +144,16 @@
               {% if photo %}
                 {% for item in photo %}
                   <tr>
-                    <td class="no">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</td>
-                    <td class="desc">Có {{ item.package.number_location }} điểm chụp <br>
+                    <td class="no">Có {{ item.package.number_location }} điểm chụp <br>
                       {{ item.package.number_gate_photo }} hình cổng <br>
                       {{ item.package.small_photo }} hình nhỏ <br>
                       {{ item.package.origin_file }} file gốc <br>
                       {{ item.package.edit_file }} file chỉnh sửa <br>
-                      {% if item.package.is_album %} có album {% else %} không có album. {% endif %} </td>
-                    <td class="unit">{{ item.price }}</td>
-                    <td class="qty">{{ item.qty }}</td>
-                    <td class="total">{{ item.discount }}</td>
+                      {% if item.package.is_album %} có album {% else %} không có album. {% endif %}</td>
+                    <td class="qty"> {{ item.str_price}}</td>
+                    <td class="unit">{{ item.str_qty}}</td>
+                    <td class="qty">{{ item.str_discount }}</td>
+                    <td class="total">{{ item.str_total_items}}</td> 
                   </tr>
                 {% endfor %}
               {% endif %}
@@ -152,43 +163,42 @@
           
       {% endif %}
       
-
-        <tfoot>
-          <tr>
-            <td colspan="2"></td>
-            <td colspan="2">TỔNG GIÁ TRƯỚC GIẢM</td>
-            <td> {{total_retail}}</td>
-          </tr>
-          <tr>
-            <td colspan="2"></td>
-            <td colspan="2">GIẢM GIÁ</td>
-            <td>{{discount}}</td>
-          </tr>
-          {% if incurred_raw != 0 %}
-          <tr>
-            <td colspan="2"></td>
-            <td colspan="2">PHÁT SINH</td>
-            <td>{{incurred}}</td>
-          </tr>
-          {% endif %}
-          
-          <tr>
-            <td colspan="2"></td>
-            <td colspan="2">TỔNG TIỀN THANH TOÁN</td>
-            <td>{{total}}</td>
-          </tr>
-          <tr>
-            <td colspan="2"></td>
-            <td colspan="2">ĐÃ THANH TOÁN</td>
-            <td>{{paid}}</td>
-          </tr>
-          <tr>
-            <td colspan="2"></td>
-            <td colspan="2">CÒN LẠI</td>
-            <td>{{receivable}}</td>
-          </tr>
-          
-        </tfoot>
+      <tfoot>
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="2">TỔNG GIÁ TRƯỚC GIẢM</td>
+          <td> {{total_retail}}</td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="2">GIẢM GIÁ</td>
+          <td>{{discount}}</td>
+        </tr>
+        {% if incurred_raw != 0 %}
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="2">PHÁT SINH</td>
+          <td>{{incurred}}</td>
+        </tr>
+        {% endif %}
+        
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="2">TỔNG TIỀN THANH TOÁN</td>
+          <td>{{total}}</td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="2">ĐÃ THANH TOÁN</td>
+          <td>{{paid}}</td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="2">CÒN LẠI</td>
+          <td>{{receivable}}</td>
+        </tr>
+        
+      </tfoot>
       
         
       </table>
