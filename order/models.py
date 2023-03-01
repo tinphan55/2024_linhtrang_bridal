@@ -228,7 +228,7 @@ class AccessorysSerive (CartItems):
                 status = "Đang cho thuê"
             elif today > self.return_date:
                 num_date = today - self.return_date
-                status = f"Quá hạn thuê {num_date.days} ngày"
+                status = f"QUÁ HẠN THUÊ {num_date.days} NGÀY"
         else:
             status = "Đã thu hồi"
         return status
