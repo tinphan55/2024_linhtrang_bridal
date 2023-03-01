@@ -9,6 +9,8 @@ from itertools import chain
 from order.forms import *
 from django.db.models import Q
 from members.models import Member
+from dateutil.relativedelta import relativedelta
+
 
 
 def convent_str_total_items(obj):
@@ -42,7 +44,7 @@ def confirm_not_returned(modeladmin, request, queryset):
 
 
 class ItemStatusFilter(admin.SimpleListFilter):
-    title = 'Item Status'
+    title = 'Tình trạng cho thuê'
     parameter_name = 'item_status'
 
     def lookups(self, request, model_admin):
@@ -62,22 +64,64 @@ class ItemStatusFilter(admin.SimpleListFilter):
             return queryset.filter(delivery_date__lte=date.today(), returned_at__isnull=True, return_date__lt=date.today())
         elif self.value() == 'Đã thu hồi':
             return queryset.filter(returned_at__isnull=False)
+        
+
+class WeddingDateFilter(admin.SimpleListFilter):
+    title = 'Chọn ngày cưới'
+    parameter_name = 'wedding_date'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('this_month', 'This month'),
+            ('next_month', 'Next month'),
+            ('next_2_months', 'Next 2 months'),
+            ('next_3_months', 'Next 3 months'),
+            # ('custom', 'Custom'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'this_month':
+            return queryset.filter(cart__wedding_date__month=date.today().month)
+        elif self.value() == 'next_month':
+            next_month = date.today().replace(day=28) + timedelta(days=4)
+            next_month = next_month.replace(day=1)
+            return queryset.filter(cart__wedding_date__month=next_month.month, cart__wedding_date__year=next_month.year)
+        elif self.value() == 'next_2_months':
+            next_month = date.today().replace(day=28) + timedelta(days=4)
+            next_month = next_month.replace(day=1)
+            next_2_months = next_month + relativedelta(months=1)
+            return queryset.filter(cart__wedding_date__gte=next_month, cart__wedding_date__lt=next_2_months)
+        elif self.value() == 'next_3_months':
+            next_month = date.today().replace(day=28) + timedelta(days=4)
+            next_month = next_month.replace(day=1)
+            next_3_months = next_month + relativedelta(months=2)
+            return queryset.filter(cart__wedding_date__gte=next_month, cart__wedding_date__lt=next_3_months)
+        elif self.value() == 'custom':
+            start_date = request.GET.get('start_date')
+            end_date = request.GET.get('end_date')
+            if start_date and end_date:
+                return queryset.filter(cart__wedding_date__range=(start_date, end_date))
+        return queryset
+
+
 
 class ReturnClotheAdmin(admin.ModelAdmin):
     def clothe_id(self, obj):
         return obj.clothe.id
     model = ReturnClothe
-    list_display = ('cart','clothe','get_color','qty' ,'delivery_date', 'return_date', 'item_status', 'returned_at' )
+    list_display = ('cart','clothe','type_clothe','qty' ,'delivery_date', 'return_date',  'returned_at', 'item_status')
     fields = ['clothe','qty', 'delivery_date', 'return_date', 'is_returned',  'returned_at','note']
     readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','item_status','is_returned', 'returned_at',]
     list_display_links = ('clothe',)
-    list_filter =  ('is_returned','cart__wedding_date' ,ItemStatusFilter)
+    list_filter =  ('is_returned' ,WeddingDateFilter,'clothe__ranking__type',ItemStatusFilter)
     search_fields = ( 'cart__client__phone', 'cart__id', 'clothe__code')
     actions = [confirm_returned, confirm_not_returned]
     admin.site.disable_action('delete_selected')
     @admin.display(description='color_')
     def get_color(self, obj):
         return obj.clothe.color
+    def type_clothe(self, obj):
+        return obj.clothe.ranking.type
     
 
     
@@ -86,11 +130,11 @@ class ReturnAccessoryAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.filter(product__is_sell=False)
     model = ReturnAccessory
-    list_display = ('cart','product','qty' ,'delivery_date', 'return_date', 'item_status', 'returned_at' )
+    list_display = ('cart','product','qty' ,'delivery_date', 'return_date','returned_at' , 'item_status' )
     fields = ['product','qty', 'delivery_date', 'return_date',  'returned_at','note', ]
     readonly_fields = ['product','qty', 'delivery_date', 'return_date','returned_at',]
     list_display_links = ('product',)
-    list_filter =  ('is_returned','cart__wedding_date' , ItemStatusFilter)
+    list_filter =  ('is_returned', WeddingDateFilter , ItemStatusFilter)
     search_fields = ( 'cart__client__phone', 'cart__id', 'product__name')
     actions = [confirm_returned, confirm_not_returned]
    
