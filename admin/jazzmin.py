@@ -115,6 +115,13 @@ JAZZMIN_SETTINGS = {
         "bills.Bill" : "fas fa-receipt",
         "event_calendar.Event":"far fa-calendar-check",
         "report.Report":"fas fa-flag-checkered" ,
+        "frontend.layouthomepage":"fas fa-pen",
+        "frontend.blockitems":"fas fa-pen",
+        "frontend.categorydetail":"fas fa-pen",
+        "frontend.clientpotential":"fas fa-person-booth",
+
+
+
     
 
 
