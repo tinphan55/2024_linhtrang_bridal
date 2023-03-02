@@ -34,3 +34,8 @@ class CategoryDetail(models.Model):
     def __str__(self):
         return str(self.title)
 
+
+class ClientPotential(models.Model):
+    service = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    phone = models.IntegerField()

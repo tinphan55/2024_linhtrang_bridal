@@ -1,12 +1,13 @@
 from django.http import HttpResponse
 from django.template import loader
 from frontend.models import *
+from django.shortcuts import render
 
 #def difine_context()
 
 
 def main(request):
-  template = loader.get_template('frontend/home2.html')
+  template = loader.get_template('frontend/home.html')
   dashboard = BlockItems.objects.filter(block_id =1) 
   about_us = BlockItems.objects.filter(block_id =2) 
   service = BlockItems.objects.filter(block_id =3) 
@@ -19,6 +20,10 @@ def main(request):
   email = BlockItems.objects.filter(block_id =9, title = "Email")[0]
   facebook = BlockItems.objects.filter(block_id =9, title = "Facebook")[0]
   ticktok = BlockItems.objects.filter(block_id =9, title = "Ticktok")[0]
+  category1 = CategoryDetail.objects.filter(category_id =13)
+  category2 = CategoryDetail.objects.filter(category_id =14)
+  category3 = CategoryDetail.objects.filter(category_id =15)
+ 
 
  
   context ={
@@ -58,6 +63,15 @@ def main(request):
     "category1_content":category[0].content, 
     "category2_content":category[1].content, 
     "category3_content":category[2].content, 
+    "category1_1":category1[0],
+    "category1_2":category1[1],
+    "category1_3":category1[2],
+    "category2_1":category2[0],
+    "category2_2":category2[1],
+    "category2_3":category2[2],
+    "category3_1":category3[0],
+    "category3_2":category3[1],
+    "category3_3":category3[2],
     "menu5": news[0].block.block,
     "news1_title":news[0].title, 
     "news2_title":news[1].title, 
@@ -80,9 +94,22 @@ def main(request):
     "phone": phone.content,
     "address": address.content,
     "mail": email.content,
-    "face": facebook.content
+    "face": facebook.content,
+    "tiktok": ticktok.content
 
     
   
   }
   return HttpResponse(template.render(context, request))
+
+
+
+def support(request):
+    if request.method == 'POST':
+        service = request.POST.get('service')
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        contact = ClientPotential(service=service, name=name, phone= phone)
+        contact.save()
+        return render(request, 'frontend/success.html')
+  

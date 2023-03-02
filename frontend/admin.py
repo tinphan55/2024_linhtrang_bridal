@@ -38,7 +38,11 @@ class CategoryDetailAdmin (admin.ModelAdmin):
 
     image_tag.short_description = 'image'
 
+class ClientPotentialAdmin(admin.ModelAdmin):
+    models =ClientPotential
+    list_display = ('service', 'name', 'phone')
 
+admin.site.register(ClientPotential,ClientPotentialAdmin)  
 admin.site.register(LayoutHomepage,LayoutHomepageAdmin)
 admin.site.register(BlockItems, BlockItemsAdmin)
 admin.site.register(CategoryDetail, CategoryDetailAdmin)
