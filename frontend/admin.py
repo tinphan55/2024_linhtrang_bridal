@@ -26,7 +26,7 @@ class BlockItemsAdmin (admin.ModelAdmin):
 class CategoryDetailAdmin (admin.ModelAdmin):
     model = CategoryDetail
     list_display =  ['image_tag','title','category','is_available','created_date']
-    fields = ['title','images','is_available']
+    fields = ['title','images','is_available','category']
     list_filter = ['category',]
     list_display_links = ['title',]
 
