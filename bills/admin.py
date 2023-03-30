@@ -14,10 +14,10 @@ class BillItemsInline(admin.TabularInline):
 
 class BillAdmin(admin.ModelAdmin):
     inlines = [BillItemsInline]
-    list_display = ('code_bill','created_date','cart_with_links','client_full_name','client_phone','title_with_link')
+    list_display = ('code_bill','created_date','cart_with_links','client_full_name','client_phone','title_with_link', 'pdf')
     fields = ('note',"next_payment")
     list_display_links = ('code_bill',)
-    search_fields = ('code_bill',)
+    search_fields = ('id',)
     list_filter = ('created_date',)
 
 
@@ -25,7 +25,6 @@ class BillAdmin(admin.ModelAdmin):
             month = datetime.now().month
             return  str(obj.id) +"_"+ str(month) 
            
-
 
     def client_full_name(self, obj):
         first_item = obj.billitems_set.first()
@@ -68,6 +67,15 @@ class BillAdmin(admin.ModelAdmin):
 
     
     cart_with_links.short_description = 'Cart'
+
+    def pdf(self, obj):
+        first_item = obj.billitems_set.first()
+        if first_item is None:
+            return "None" 
+        else:
+            url = reverse('bills:pdf', args=[obj.pk])
+            return format_html("<a href='{}' target='_blank' style='background-color: #007bff; border-radius: 5px; color: white; padding: 5px;'>Tải pdf</a>", url)
+    
 
 
 
