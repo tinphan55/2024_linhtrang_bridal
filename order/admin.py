@@ -109,7 +109,7 @@ class ReturnClotheAdmin(admin.ModelAdmin):
     def clothe_id(self, obj):
         return obj.clothe.id
     model = ReturnClothe
-    list_display = ('cart','clothe','type_clothe','qty' ,'delivery_date', 'return_date',  'returned_at', 'item_status')
+    list_display = ('cart','clothe','name_clothe','type_clothe','qty' ,'delivery_date', 'return_date',  'returned_at', 'item_status')
     fields = ['clothe','qty', 'delivery_date', 'return_date', 'is_returned',  'returned_at','note']
     readonly_fields = ['clothe','qty', 'delivery_date', 'return_date','item_status','is_returned', 'returned_at',]
     list_display_links = ('clothe',)
@@ -122,6 +122,10 @@ class ReturnClotheAdmin(admin.ModelAdmin):
         return obj.clothe.color
     def type_clothe(self, obj):
         return obj.clothe.ranking.type
+    def name_clothe(self, obj):
+        return obj.clothe.name
+
+    
     
 
     
