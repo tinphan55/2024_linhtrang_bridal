@@ -52,7 +52,7 @@ class BillAdmin(admin.ModelAdmin):
             return "None" 
         else:
             url = reverse('bills:details', args=[obj.pk])
-            return format_html("<a href='{}' target='_blank' style='background-color: #007bff; border-radius: 5px; color: white; padding: 5px;'>Click xem bill</a>", url)
+            return format_html("<a href='{}' target='_blank' style='background-color: #007bff; border-radius: 5px; color: white; padding: 5px;'>Click xem</a>", url)
     title_with_link.short_description = 'Xem hóa đơn'
 
 

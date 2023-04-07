@@ -118,6 +118,8 @@ class ReturnClotheAdmin(admin.ModelAdmin):
         return obj.clothe.ranking.type
     def name_clothe(self, obj):
         return obj.clothe.name
+    type_clothe.short_description = 'Mã áo'
+    name_clothe.short_description = 'Tên áo'
 
     
     
