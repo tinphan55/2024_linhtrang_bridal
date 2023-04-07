@@ -9,26 +9,23 @@ from django.dispatch import receiver
 from django.db.models import  Sum, F
 from datetime import datetime, timedelta, date
 from django.conf import settings
+from itertools import chain
+from django.db.models import Max
 
 
 
-
-
-# def get_combo_choices():
-#         combo_choices = [(c.id, c.name) for c in ComboPhoto.objects.all()]
-#         combo_choices.insert(0, ("0", "None"))
-#         return combo_choices
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=datetime.now)
-    wedding_date= models.DateField(null=False, blank= False)
-    # combo = models.IntegerField(choices=get_combo_choices(), default="0", blank=True, null=True)
-    note = models.TextField(max_length=500, null= True, blank=True)
-    incurred = models.IntegerField(null= True, blank=True, default=0)
-    total_price = models.FloatField(default=0)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, 
+                             verbose_name="Người tạo")
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, 
+                               verbose_name="KH")
+    created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
+    wedding_date= models.DateField(null=False, blank= False, verbose_name="Ngày cưới")
+    note = models.TextField(max_length=500, null= True, blank=True, verbose_name="Ghi chú")
+    incurred = models.IntegerField(null= True, blank=True, default=0, verbose_name="Phát sinh")
+    total_price = models.FloatField(default=0, verbose_name='Tổng tiền')
     total_bill = models.FloatField(default=0)
     paid = models.IntegerField(null= False, blank=False, default=0)
     receivable = models.FloatField(default=0)
@@ -39,71 +36,119 @@ class Cart(models.Model):
     
     def return_id_cart(self):
         return self.id
+    
 
-        
-    # def save(self, *args, **kwargs):
-    #     clothe = ClotheService.objects.filter(cart_id =self.id )
-    #     total = clothe.aggregate(total=Sum('total_items'))
-    #     total_price = total['total']
-    #     if total_price == None:
-    #         total_clothe = 0
-    #     else:
-    #         total_clothe = total_price
-        
-    #     items_photo = Cart.objects.annotate(total= Sum(F('photoservice__total_items'))).filter(pk=self.pk).values()
-    #     if items_photo.count() ==0:
-    #         total_photo = 0
-    #     else:
-    #         total_photo= items_photo[0]['total'] or 0
-        
-        
-    #     items_makeup = Cart.objects.annotate(total= Sum(F('makeupservice__total_items'))).filter(pk=self.pk).values()
-    #     if items_makeup.count() ==0:
-    #         total_makecup = 0
-    #     else:
-    #         total_makecup = items_makeup[0]['total'] or 0
-        
-    #     items_accessory = Cart.objects.annotate(total= Sum(F('accessorysserive__total_items'))).filter(pk=self.pk).values()
-    #     if items_accessory.count()==0:
-    #         total_accessory = 0
-    #     else:
-    #         total_accessory = items_accessory[0]['total'] or 0
-    #     total =  total_clothe + total_photo + total_makecup + total_accessory
-    #     self.total_price = total 
-
-    #     items_incurred = Cart.objects.annotate(total= Sum(F('incurredcart__amount'))).filter(id=self.id).values()
-    #     if items_incurred.count() ==0:
-    #         self.incurred = 0
-    #     else:
-    #         self.incurred = items_incurred[0]['total'] or 0
-    #     self.total_bill = self.total_price + self.incurred
-
-    #     items_payment = Cart.objects.annotate(total= Sum(F('paymentschedulecart__amount'))).filter(id=self.id).values()
-    #     if items_payment.count() ==0:
-    #         self.paid = 0
-    #     else:
-    #         self.paid = items_payment[0]['total'] or 0
-    #     self.receivable = self.total_bill - self.paid
-        
-    #     super(Cart, self).save(*args, **kwargs)
+    @property
+    def latest_paid(self):
+        latest_payment = PaymentScheduleCart.objects.filter(cart=self).aggregate(Max('created_at'))
+        return latest_payment['created_at__max']
+    
+    @property
+    def total_clothe(self):
+        clothe= ClotheService.objects.filter(cart_id = self.pk )
+        total = sum(i.total_items for i in clothe)
+        return total
+   
+    
+    @property
+    def total_photo(self):
+        photo= PhotoService.objects.filter(cart_id = self.pk )
+        total = sum(i.total_items for i in photo)
+        return total
+    @property
+    def total_makup(self):
+        makup= MakeupService.objects.filter(cart_id = self.pk )
+        total = sum(i.total_items for i in makup)
+        return total
+    
+    #DT phụ kiện sẽ tính có chọn lọc, dưa vào field is_hr để sum
+    @property
+    def total_accessory(self):
+        accessory= AccessorysSerive.objects.filter(cart_id = self.pk, product__is_hr = True)
+        total = sum(i.total_items for i in accessory)
+        return total
+    
+    @property
+    def str_total_clothe(self):
+        return '{:,.0f}'.format(self.total_clothe)
+    @property
+    def str_total_photo(self):
+        return '{:,.0f}'.format(self.total_photo)
+    @property
+    def str_total_makup(self):
+        return '{:,.0f}'.format(self.total_makup)
+    @property
+    def str_total_accessory(self):
+        return '{:,.0f}'.format(self.total_accessory)
+    
+    @property
+    def total_discount_raw(self):
+        clothe_items = ClotheService.objects.filter(cart_id = self.pk ).values()
+        photo_items = PhotoService.objects.filter(cart_id = self.pk ). values()
+        makeup_items = MakeupService.objects.filter(cart_id = self.pk ). values()
+        accessory_items= AccessorysSerive.objects.filter(cart_id = self.pk ). values()
+        cart = list(chain(clothe_items, photo_items,makeup_items,accessory_items  ))
+        total_discount = 0
+        for items in cart:
+            if items['discount'] == None:
+                    items['discount'] = 0
+                    total_discount = total_discount + items['discount']
+            else:
+                    total_discount = total_discount + items['discount']
+        return total_discount
+    #doanh thu trước giảm giá
+    @property
+    def total_cart_raw(self):
+        return self.total_clothe + self.total_photo + self.total_makup +self.total_accessory +self.total_discount_raw
+    
+    @property
+    def total_incurred_raw(self):
+        incurred_items = IncurredCart.objects.filter(cart_id = self.pk ).values()
+        total = 0
+        for items in incurred_items:
+            total = total + items['amount']
+        return total 
+    
+    @property
+    def total_payment_raw(self):
+        payment_items = PaymentScheduleCart.objects.filter(cart_id = self.pk ).values()
+        total = 0
+        for items in payment_items:
+            total = total + items['amount']
+        return total 
+     #doanh thu sau giảm giá
+    @property
+    def total_raw(self):
+        total = self.total_cart_raw + self.total_incurred_raw - self.total_discount_raw
+        return total
+    @property
+    def str_total_raw(self):
+        return '{:,.0f}'.format(self.total_raw)
+    @property
+    def receivable_row(self):
+        total = self.total_raw - self.total_payment_raw
+        return total
+    
+    
+    
 
 class CartItems(models.Model):
     class Meta:
         abstract = True
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
     created_at = models.DateTimeField(default=datetime.now)
-    price = models.FloatField(blank=True, default=0)
-    qty = models.IntegerField(default=1)
-    discount = models.IntegerField(null= True, blank=True, default=0)
-    is_discount = models.BooleanField(default=False)  
-    total_items = models.IntegerField(default=0)
+    price = models.FloatField(blank=True, default=0, verbose_name="Giá")
+    qty = models.IntegerField(default=1, verbose_name="Số lượng")
+    discount = models.IntegerField(null= True, blank=True, default=0,verbose_name= "Giảm giá")
+    is_discount = models.BooleanField(default=False, verbose_name="Có giảm giá")  
+    total_items = models.IntegerField(default=0, verbose_name="Tổng tiền")
 
     def save(self, *args, **kwargs):
         total_items = self.price*self.qty
         if total_items == None:
             self.total_items = 0
         else:
-            self.total_items = total_items
+            self.total_items = total_items - self.discount
         super(CartItems, self).save(*args, **kwargs)
     
     @property
@@ -114,22 +159,25 @@ class CartItems(models.Model):
     def str_discount(self):
         discount = self.discount
         return '{:,.0f}'.format( discount)
+    
     @property
     def str_total_items(self):
-        total_items = self.total_items - self.discount
-        return '{:,.0f}'.format( total_items)
+        return '{:,.0f}'.format( self.total_items)
 
 
     
 class ClotheService(CartItems):
     clothe = models.ForeignKey(Clothe, on_delete = models.CASCADE,
-     limit_choices_to={'is_available': True})
-    delivery_date = models.DateField(null= True, blank=True)
-    return_date = models.DateField(null= True, blank=True)
-    is_returned = models.BooleanField(default=False) 
-    returned_at = models.DateTimeField(null=True, blank=True)  
-    note = models.TextField(max_length=500, null = True, blank=True)
-    noti = models.CharField (max_length=200)
+     limit_choices_to={'is_available': True}, verbose_name='Trang phục')
+    delivery_date = models.DateField(null= True, blank=True, verbose_name="Ngày giao")
+    return_date = models.DateField(null= True, blank=True, verbose_name="Ngày hẹn trả")
+    is_returned = models.BooleanField(default=False, verbose_name="Đã trả") 
+    returned_at = models.DateTimeField(null=True, blank=True,verbose_name= "Ngày trả")  
+    note = models.TextField(max_length=500, null = True, blank=True, verbose_name="Ghi chú")
+    noti = models.CharField (max_length=200, verbose_name='Thông báo')
+    class Meta:
+        verbose_name = 'Cho thuê đồ cưới'
+        verbose_name_plural = 'Cho thuê đồ cưới'
     
     def __str__(self):
         return str(self.clothe)
@@ -164,8 +212,12 @@ class ClotheService(CartItems):
 
 class PhotoService(CartItems):
     package = models.ForeignKey(Photo, on_delete = models.CASCADE, 
-        limit_choices_to={'is_available': True})
-    note = models.TextField(max_length=500, null= True, blank=True)
+        limit_choices_to={'is_available': True}, verbose_name='Gói chụp')
+    note = models.TextField(max_length=500, null= True, blank=True, 
+                            verbose_name="Ghi chú")
+    class Meta:
+        verbose_name = 'Chụp hình'
+        verbose_name_plural = 'Chụp hình'
     def __str__(self):
         return str(self.package)
 
@@ -180,9 +232,11 @@ class PhotoService(CartItems):
     
 class MakeupService(CartItems):
     package = models.ForeignKey(Makeup, on_delete = models.CASCADE, 
-        limit_choices_to={'is_available': True})
-    note = models.TextField(max_length=500, null= True, blank=True)
-
+        limit_choices_to={'is_available': True}, verbose_name='Gói trang điểm')
+    note = models.TextField(max_length=500, null= True, blank=True, verbose_name="Ghi chú")
+    class Meta:
+        verbose_name = 'Trang điểm'
+        verbose_name_plural = 'Trang điểm'
     def save(self, *args, **kwargs):
         self.price = self.package.price
         if self.is_discount == True:
@@ -195,15 +249,18 @@ class MakeupService(CartItems):
 
 class AccessorysSerive (CartItems):
     product = models.ForeignKey(Accessory, on_delete = models.CASCADE, 
-        limit_choices_to={'is_available': True})
-    delivery_date = models.DateField(null= True, blank=True)
-    return_date = models.DateField(null= True, blank=True)
-    is_returned = models.BooleanField(default=False) 
-    returned_at = models.DateTimeField(null=True, blank=True)  
-    note = models.TextField(max_length=500, null = True, blank=True)
+        limit_choices_to={'is_available': True}, verbose_name='Sản phẩm')
+    delivery_date = models.DateField(null= True, blank=True, verbose_name='Ngày giao')
+    return_date = models.DateField(null= True, blank=True,verbose_name= "Ngày hẹn trả")
+    is_returned = models.BooleanField(default=False, verbose_name="Đã trả") 
+    returned_at = models.DateTimeField(null=True, blank=True, verbose_name="Ngày trả")  
+    note = models.TextField(max_length=500, null = True, blank=True, verbose_name="Ghi chú")
     noti = models.CharField (max_length=200, null = True, blank=True)
     def __str__(self):
         return str(self.product)
+    class Meta:
+        verbose_name = 'Phụ kiện'
+        verbose_name_plural = 'Phụ kiện'
     
     def save(self, *args, **kwargs):
         self.price = self.product.price
@@ -235,17 +292,24 @@ class AccessorysSerive (CartItems):
     
 class IncurredCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
-    description = models.TextField(max_length=500, null=False)
-    created_at = models.DateTimeField(default=datetime.now)
-    amount =  models.IntegerField(null= False, default=0)
+    description = models.TextField(max_length=500, null=False, verbose_name="Mô tả")
+    created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
+    amount =  models.IntegerField(null= False, default=0, verbose_name="Số tiền")
+    class Meta:
+        verbose_name = 'Tiền phát sinh'
+        verbose_name_plural = 'Tiền phát sinh'
     def __str__(self):
         return str(self.cart)
     
+    
 class PaymentScheduleCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
-    amount =  models.IntegerField(null= False, default=0)
-    description = models.TextField(max_length=500)
-    created_at = models.DateTimeField(default=datetime.now)
+    amount =  models.IntegerField(null= False, default=0, verbose_name="Số tiền")
+    description = models.TextField(max_length=500, verbose_name='Mô tả')
+    created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
+    class Meta:
+        verbose_name = 'Khách trả tiền'
+        verbose_name_plural = 'Khách trả tiền'
    
     def __str__(self):
         return str(self.cart)
@@ -254,6 +318,8 @@ class PaymentScheduleCart(models.Model):
 class ReturnClothe(ClotheService):
     class Meta:
         proxy = True
+        verbose_name = 'Quản lí trả đồ thuê cưới'
+        verbose_name_plural = 'Quản lí trả đồ thuê cưới'
 
     def __str__(self):
         return str(self.clothe.code)
@@ -264,6 +330,8 @@ class ReturnClothe(ClotheService):
 class ReturnAccessory (AccessorysSerive):
     class Meta:
         proxy = True
+        verbose_name = 'Quản lí phụ kiện'
+        verbose_name_plural = 'Quản lí phụ kiện'
     def get_queryset(self):
         return super().get_queryset().filter(product__is_sell=False)
     def __str__(self):

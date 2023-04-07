@@ -83,8 +83,8 @@ class AccessoryAdmin(admin.ModelAdmin):
          form = super(AccessoryAdmin, self).get_form(request, obj, **kwargs)
          form.base_fields['ranking'].queryset = Ranking.objects.filter(category=4)
          return form 
-     list_display = ('id','name','ranking','is_sell','price','discount','qty_available','qty_add','qty_order', 'is_available')
-     fields = ('name','ranking','is_sell','qty','price', 'discount','is_available','description' , 'tags')
+     list_display = ('id','name','ranking','is_sell','price','discount','qty_available','is_hr', 'is_available')
+     fields = ('name','ranking','is_sell','qty','price', 'discount','is_available','description','is_hr' , 'tags')
      list_display_links = ('name',)
      search_fields = ('name',)
      list_filter=('is_sell',)

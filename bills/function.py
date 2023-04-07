@@ -131,7 +131,7 @@ def context_bill(pk):
     items = lookup_items_bill(pk)
     cart= bills.billitems_set.first().cart
     list_cart = bills.billitems_set.all()
-    staff = Member.objects.get(id_member_id=cart.user.id)
+    staff = Member.objects.get(id_member_id = cart.user.id)
     clothe = items['clothe_bill']
     photo = items['photo_bill']
     makup = items['makup_bill']

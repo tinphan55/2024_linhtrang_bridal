@@ -110,6 +110,7 @@ class Accessory(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('Tag', blank=True, null=True)
     is_sell = models.BooleanField(default=False)
+    is_hr = models.BooleanField(default=False)
     #date_check = models.DateField(null = True, blank= True, default= datetime.now())
   
 

@@ -23,7 +23,9 @@ urlpatterns = [
     path('', include('order.urls')),
     path('', include('event_calendar.urls')),
     path('', include('frontend.urls')),
-    path('', include('bills.urls'))
+    path('', include('bills.urls')),
+    path('', include('members.urls'))
+
     
 ] 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

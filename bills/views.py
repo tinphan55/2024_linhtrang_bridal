@@ -1,6 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from bills.function import *
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Image, Spacer
+from django.template.loader import get_template
+from reportlab.lib.units import cm
 
 
 

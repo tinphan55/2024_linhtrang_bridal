@@ -1,0 +1,179 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+ 
+<div class="col-md-2"></div>
+<div class="col-md-9">
+    <div style="height: 20px"></div>
+    <table class="table table-striped" border="2">
+        <tr >
+            <td colspan="2" class="text-center" >
+                <b><strong class="white-text">LINH TRANG BRIDAL - PHIẾU LƯƠNG</strong></b>
+            </td>
+        </tr>
+        <tr>
+            <td>Mã nhân viên:<input type="hidden" name="ecode"></td>
+            <td>{{hr.id}}<input type="hidden" name="payperiod"></td>
+        </tr>
+        <tr>
+            <th>Họ và tên</td>
+            <th>{{hr.first_name}} {{hr.last_name}}</td>
+        </tr>
+        
+        <tr>
+            <td>
+                <table class="table table-hover">
+                    <tbody>
+                        
+                    <tr>
+                        <td>Cấp nhân viên</td>
+                    </tr>
+                    <tr>
+                        <td>Lương cơ bản</td>
+                        <td><input type="hidden" name="basicpay"></td>
+                    </tr>
+                    <tr>
+                        <td>Trợ cấp</td>
+                        <td><input type="hidden" name="hra"></td>
+                    </tr>
+                    <tr>
+                        <td>Hoa hồng</td>
+                        <td><input type="hidden" name="hra"></td>
+                    </tr>
+                    <tr>
+                        <td>Phát sinh</td>
+                        <td><input type="hidden" name="hra"></td>
+                    </tr>
+                    </tbody>
+                    </td></table>
+            <td>
+                <table class="table table-hover">
+                    <thead></thead>
+                    <tbody>
+                    <tr>
+                        <td>Cấp {{hr.ranking}}</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>{{hr.salary}}</td>
+                        <td><input type="hidden" name="proftax"></td>
+                    </tr>
+                    <tr>
+                        <td>{{hr.subsidize}}</td>
+                        <td><input type="hidden" name="tax"></td>
+                    </tr>
+                    <tr>
+                        <td>{{hr.commission}}</td>
+                        <td><input type="hidden" name="tax"></td>
+                    </tr>
+                    <tr>
+                        <td>{{hr.incurred}}</td>
+                        <td><input type="hidden" name="tax"></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table class="table table-hover">
+                   <strong>Tổng thu nhập</strong> 
+                    <tbody>
+                    <tr>
+                        <td>Tổng trước thuế</td>
+                    </tr>
+                    <tr>
+                        <td>Thuế</td>
+                    </tr>
+                    <tr>
+                        <th>Tổng nhận</th>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </td>
+            <td>
+                <table class="table table-hover">
+                    <thead>Đơn vị Đồng</thead>
+                    <tbody>
+                    <tr>
+                        <td>{{hr.imcome}}</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <th>{{hr.imcome}}</th>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</div>
+
+</div>
+
+<style>
+ .white-text {
+    color: white;
+    padding-bottom: 20px;
+  }
+
+    /* CSS để đổi màu của các dòng */
+    tr:nth-child(odd) {
+      background-color: #f2f2f2;
+    }
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+   
+    /* CSS để đổi màu chữ */
+    td {
+      color: black;
+    }
+    th {
+      color: black;
+      background-color: #f2f2f2;
+    }
+  </style>
+
+<hr/> 
+
+<b><strong class="white-text"> CHI TIẾT CART THU TIỀN ĐỦ TRONG THÁNG </strong></b>
+<table class="table" style="border: 1px solid rgb(239, 221, 221); border-top-color:rgb(234, 228, 228);">
+    <thead>
+      <tr>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Nhân viên</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Khách hàng</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Ngày cưới</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Ngày tạo cart</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT cho thuê đồ</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT chụp hình</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT trang điểm</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT phụ kiện</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Tổng DT</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in cart %}
+      <tr>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{x.user.first_name }} {{x.user.last_name }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{x.client }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.wedding_date }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.created_at }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.str_total_clothe}}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.str_total_photo}}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.str_total_makup}}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.str_total_accessory}}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.str_total_raw }}</td>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+  <p>Quay lại <a href="{% url 'overview' %}?month={{ request.GET.month }}&year={{ request.GET.year }}">Quay lại Bảng lương</a></p>
+  {% endblock %}

@@ -5,26 +5,20 @@ from order.models import *
 from django.db.models import  Sum
 from event_calendar.models import Event
 from datetime import datetime, timedelta, date
-from itertools import chain
 from order.forms import *
 from django.db.models import Q
 from members.models import Member
 from dateutil.relativedelta import relativedelta
 
 
-
-def convent_str_total_items(obj):
-    total_items = obj.total_items
-    return f"{total_items:,}"
-
 class ClotheServiceInline(admin.StackedInline):
     form = ClotheServiceForm
     model= ClotheService
     fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_']
     readonly_fields = ['total_items_',]
-    @admin.display(description='total_items_')
+    @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
-        return convent_str_total_items(obj, )
+        return obj.str_total_items
     
 @admin.action(description='Xác nhận sản phẩm được trả')
 def confirm_returned(modeladmin, request, queryset):
@@ -155,18 +149,18 @@ class MakeupServiceInline(admin.StackedInline):
     #raw_id_fields = ['product']
     readonly_fields = ['total_items_',]
     extra = 1
-    @admin.display(description='total_items_')
+    @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
-        return convent_str_total_items(obj, )
+        return obj.str_total_items
 
 class AccessoryServiceInline(admin.StackedInline):
     model =  AccessorysSerive
     fields = ['product','qty','is_discount','total_items_', 'delivery_date', 'return_date']
     #raw_id_fields = ['product']
     readonly_fields = ['total_items_',]
-    @admin.display(description='total_items_')
+    @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
-        return convent_str_total_items(obj, )
+        return obj.str_total_items
     
 
     
@@ -177,9 +171,9 @@ class PhotoServiceInline(admin.StackedInline):
     fields = ['package','is_discount','note','total_items_']
     readonly_fields = ['total_items_', ]
     extra = 1
-    @admin.display(description='total_items_')
+    @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
-        return convent_str_total_items(obj, )
+        return obj.str_total_items
 
 class IncurredCartInline(admin.StackedInline):
     form = IncurredCartForm
@@ -194,62 +188,12 @@ class PaymentCartInline(admin.StackedInline):
    
         
 
-#Cong thuc tinh tong bill
-def total_cart_raw(obj):
-    clothe_items = ClotheService.objects.filter(cart_id = obj.id ).values()
-    photo_items = PhotoService.objects.filter(cart_id = obj.id ). values()
-    makeup_items = MakeupService.objects.filter(cart_id = obj.id ). values()
-    accessory_items= AccessorysSerive.objects.filter(cart_id = obj.id ). values()
-    cart = list(chain(clothe_items, photo_items,makeup_items,accessory_items  ))
-    total_price = 0
-    for items in cart:
-        total_price = total_price + items['total_items']
-    return total_price
 
-def total_discount_raw(obj):
-    clothe_items = ClotheService.objects.filter(cart_id = obj.id ).values()
-    photo_items = PhotoService.objects.filter(cart_id = obj.id ). values()
-    makeup_items = MakeupService.objects.filter(cart_id = obj.id ). values()
-    accessory_items= AccessorysSerive.objects.filter(cart_id = obj.id ). values()
-    cart = list(chain(clothe_items, photo_items,makeup_items,accessory_items  ))
-    total_discount = 0
-    for items in cart:
-        if items['discount'] == None:
-                items['discount'] = 0
-                total_discount = total_discount + items['discount']
-        else:
-                total_discount = total_discount + items['discount']
-    return total_discount
-
-def total_incurred_raw(obj):
-    incurred_items = IncurredCart.objects.filter(cart_id = obj.id ).values()
-    total = 0
-    for items in incurred_items:
-        total = total + items['amount']
-    return total 
-
-def total_payment_raw(obj):
-    payment_items = PaymentScheduleCart.objects.filter(cart_id = obj.id ).values()
-    total = 0
-    for items in payment_items:
-        total = total + items['amount']
-    return total 
-
-def total_row(obj):
-    total = total_cart_raw(obj) + total_incurred_raw(obj) - total_discount_raw(obj)
-    return total
-
-
-
-
-def receivable_row(obj):
-    total = total_row(obj) - total_payment_raw(obj)
-    return total
 
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date')
+    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date',)
     fields = ['user','client','wedding_date','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_']
     list_display_links=('client',)
     search_fields=('client__phone',)
@@ -260,42 +204,37 @@ class CartAdmin(admin.ModelAdmin):
     
     def image_tag(self, obj):
         member = Member.objects.filter(id_member_id =obj.user_id).first()
-        if member.avatar:
+        if member is not None and member.avatar:
             return format_html('<img src="{}" style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover;"/>'.format(member.avatar.url))
         else:
             return format_html('<img src="/media/member/default-image.jpg"style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover;"/>')                   
 
     image_tag.short_description = 'avatar'
 
-    @admin.display(description='total_cart')
+    @admin.display(description='Tổng trước giảm')
     def total_cart(self, obj):
-        total_price = total_cart_raw(obj)
-        return f"{total_price:,}"
+        return f"{obj.total_cart_raw:,}"
 
-    @admin.display(description='total_incurred')
+    @admin.display(description='Tổng phát sinh')
     def total_incurred(self, obj):
-        total = total_incurred_raw(obj)
-        return f"{total:,}"
-    
-    @admin.display(description='total')
-    def total(self, obj):
-        total = total_row(obj)
-        return f"{total:,}"
-
-    @admin.display(description='paid_')
-    def paid_(self, obj):
-        total = total_payment_raw(obj)
-        return f"{total:,}"
-
-    @admin.display(description='receivable_')
-    def receivable_(self, obj):
-        total = receivable_row(obj)
-        return f"{total:,}"
-
-    @admin.display(description='total_discount')
+        return f"{obj.total_incurred_raw:,}"
+    @admin.display(description='Tổng giảm')
     def total_discount (self, obj):
-        total_discount = total_discount_raw(obj)
-        return f"{total_discount:,}"
+        return f"{obj.total_discount_raw:,}"
+    
+    @admin.display(description='Tổng sau giảm')
+    def total(self, obj):
+        return f"{obj.total_raw:,}"
+
+    @admin.display(description='Tổng trả')
+    def paid_(self, obj):
+        return f"{obj.total_payment_raw:,}"
+
+    @admin.display(description='Cần thu')
+    def receivable_(self, obj):
+        return f"{obj.receivable_row:,}"
+
+    
     
 
    

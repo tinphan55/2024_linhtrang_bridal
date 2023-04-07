@@ -1,0 +1,48 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<body>
+
+  <form method="GET" action="{% url 'overview' %}">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Xác nhận</button>
+  </form>
+
+  
+<hr/>
+<h1 class="duy"> TỔNG QUAN THU NHẬP NHÂN VIÊN</h1>
+<table class="table" style="border: 1px solid rgb(239, 221, 221); border-top-color:rgb(234, 228, 228);">
+    <thead>
+      <tr>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Mã nhân viên</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Họ và tên</th>
+        <th style="border: 1px solid rgb(234, 228, 228); width: 100px; background-color: #e9f9ee;">Cấp bật</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Lương cơ bản</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Hoa hồng</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Trợ cấp</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Phát sinh</th>
+        <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">Tổng thu nhập</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in hr %}
+      <tr>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{x.id }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">
+          <a href="{% url 'paycheck' pk=x.id month=request.GET.month year=request.GET.year %}">{{ x.first_name }} {{ x.last_name }}</a>
+        </td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.ranking }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.salary }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.commission }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.subsidize }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);">{{ x.incurred }}</td>
+        <td style="border: 1px solid rgb(234, 228, 228);; width: 100px; background-color: #338951"> {{x.imcome}}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+{% endblock %}

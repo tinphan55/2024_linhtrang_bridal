@@ -29,7 +29,7 @@ def define_id(code):
   return pk, name, category
 
 
-from django.shortcuts import render
+
 
 def index(request):
     code = request.GET.get('code')
@@ -72,10 +72,6 @@ def index(request):
         'name': name,
         'category': category,
     }
-    
-   
-   
-   
     return render(request, 'index.html', context)
 
 
