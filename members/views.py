@@ -25,7 +25,7 @@ def collect_cart_salary(info, month, year ):
         total_clothe = sum(i.total_clothe for i in cart_cal)
         total_photo = sum(i.total_photo for i in cart_cal)
         total_makup = sum(i.total_makup for i in cart_cal)
-        total_accessory = sum(i.total_accessory for i in cart_cal)
+        total_accessory = sum(i.total_accessory_hr for i in cart_cal)
         item['id'] = mem['member']
         item['first_name'] = mem['member__first_name']
         item['last_name']= mem['member__last_name']

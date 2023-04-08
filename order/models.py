@@ -63,8 +63,14 @@ class Cart(models.Model):
     
     #DT phụ kiện sẽ tính có chọn lọc, dưa vào field is_hr để sum
     @property
-    def total_accessory(self):
+    def total_accessory_hr(self):
         accessory= AccessorysSerive.objects.filter(cart_id = self.pk, product__is_hr = True)
+        total = sum(i.total_items for i in accessory)
+        return total
+    
+    @property
+    def total_accessory(self):
+        accessory= AccessorysSerive.objects.filter(cart_id = self.pk)
         total = sum(i.total_items for i in accessory)
         return total
     

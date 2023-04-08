@@ -215,26 +215,26 @@ class CartAdmin(admin.ModelAdmin):
 
     @admin.display(description='Tổng trước giảm')
     def total_cart(self, obj):
-        return f"{obj.total_cart_raw:,}"
+        return '{:,.0f}'.format(obj.total_cart_raw)
 
     @admin.display(description='Tổng phát sinh')
     def total_incurred(self, obj):
-        return f"{obj.total_incurred_raw:,}"
+        return '{:,.0f}'.format(obj.total_incurred_raw)
     @admin.display(description='Tổng giảm')
     def total_discount (self, obj):
-        return f"{obj.total_discount_raw:,}"
+        return '{:,.0f}'.format(obj.total_discount_raw)
     
     @admin.display(description='Tổng sau giảm')
     def total(self, obj):
-        return f"{obj.total_raw:,}"
+        return '{:,.0f}'.format(obj.total_raw)
 
     @admin.display(description='Tổng trả')
     def paid_(self, obj):
-        return f"{obj.total_payment_raw:,}"
+        return '{:,.0f}'.format(obj.total_payment_raw)
 
     @admin.display(description='Cần thu')
     def receivable_(self, obj):
-        return f"{obj.receivable_row:,}"
+        return'{:,.0f}'.format(obj.receivable_row)
 
     
     
