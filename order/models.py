@@ -141,15 +141,16 @@ class CartItems(models.Model):
     qty = models.IntegerField(default=1, verbose_name="Số lượng")
     discount = models.IntegerField(null= True, blank=True, default=0,verbose_name= "Giảm giá")
     is_discount = models.BooleanField(default=False, verbose_name="Có giảm giá")  
-    total_items = models.IntegerField(default=0, verbose_name="Tổng tiền")
+    #total_items = models.IntegerField(default=0, verbose_name="Tổng tiền")
 
-    def save(self, *args, **kwargs):
-        total_items = self.price*self.qty
-        if total_items == None:
-            self.total_items = 0
+    @property
+    def total_items(self):
+        total = self.price*self.qty
+        if total == None:
+            total = 0
         else:
-            self.total_items = total_items - self.discount
-        super(CartItems, self).save(*args, **kwargs)
+            total = total - self.discount
+        return total
     
     @property
     def str_price(self):

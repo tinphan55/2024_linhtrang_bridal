@@ -38,50 +38,7 @@ def fetch_resources(uri, rel):
         path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ''))
     return path
 
-def total_cart_raw(pk):
-    clothe_items = ClotheService.objects.filter(cart_id = pk ).values()
-    photo_items = PhotoService.objects.filter(cart_id = pk ). values()
-    makeup_items = MakeupService.objects.filter(cart_id = pk ). values()
-    accessory_items= AccessorysSerive.objects.filter(cart_id = pk ). values()
-    cart = list(chain(clothe_items, photo_items,makeup_items,accessory_items  ))
-    total_price = 0
-    for items in cart:
-        total_price = total_price + items['total_items']
-    return total_price
 
-
-def total_discount_raw(pk):
-    clothe_items = ClotheService.objects.filter(cart_id = pk ).values()
-    photo_items = PhotoService.objects.filter(cart_id = pk ). values()
-    makeup_items = MakeupService.objects.filter(cart_id = pk ). values()
-    accessory_items= AccessorysSerive.objects.filter(cart_id = pk ). values()
-    cart = list(chain(clothe_items, photo_items,makeup_items,accessory_items  ))
-    total_discount = 0
-    for items in cart:
-        if items['discount'] == None:
-                items['discount'] = 0
-                total_discount = total_discount + items['discount']
-        else:
-                total_discount = total_discount + items['discount']
-    return total_discount
-
-def total_incurred_raw(pk):
-    incurred_items = IncurredCart.objects.filter(cart_id = pk ).values()
-    total = 0
-    for items in incurred_items:
-        total = total + items['amount']
-    return total 
-
-def total_payment_raw(pk):
-    payment_items = PaymentScheduleCart.objects.filter(cart_id = pk ).values()
-    total = 0
-    for items in payment_items:
-        total = total + items['amount']
-    return total 
-
-def total_row(pk):
-    total = total_cart_raw(pk) + total_incurred_raw(pk) - total_discount_raw(pk)
-    return total
 
 def get_total_values_bill(pk):
     bill_values ={}
@@ -91,16 +48,16 @@ def get_total_values_bill(pk):
     incurred = 0
     paid = 0
     for qs in cart_list:
-        total_retail  = total_cart_raw(qs.pk) +total_retail 
-        discount = total_discount_raw(qs.pk) + discount
-        incurred = total_incurred_raw(qs.pk) + incurred
-        total = total_retail +incurred-discount
-        paid = total_payment_raw(qs.pk)+ paid
-        receivable = total - paid
+        total_retail  = qs.total_cart_raw + total_retail
+        discount = qs.total_discount_raw + discount
+        incurred = qs.total_incurred_raw + incurred
+        net_total = total_retail +incurred-discount
+        paid = qs.total_payment_raw + paid 
+        receivable =qs.receivable_row
     bill_values['total_retail'] =total_retail
     bill_values['discount'] = discount
     bill_values['incurred'] = incurred
-    bill_values['total'] =  total
+    bill_values['total'] =  net_total
     bill_values['paid'] = paid
     bill_values['receivable'] = receivable
     return bill_values
