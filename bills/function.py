@@ -119,14 +119,14 @@ def context_bill(pk):
         first_clothe = clothe[0][0]
         
     bill_total = get_total_values_bill(pk)
-    total_retail = f"{bill_total['total_retail']:,}"
-    discount = f"{bill_total['discount']:,}"
-    incurred = f"{bill_total['incurred']:,}"
-    total = f"{bill_total['total']:,}"
-    paid = f"{bill_total['paid']:,}"
-    receivable_raw = bill_total['receivable']
-    incurred_raw = bill_total['incurred']
-    receivable = f"{bill_total['receivable']:,}"
+    total_retail = '{:,.0f}'.format(bill_total['total_retail'])
+    discount = '{:,.0f}'.format(bill_total['discount'])
+    incurred = '{:,.0f}'.format(bill_total['incurred'])
+    total = '{:,.0f}'.format(bill_total['total'])
+    paid = '{:,.0f}'.format(bill_total['paid'])
+    receivable_raw = '{:,.0f}'.format(bill_total['receivable'])
+    incurred_raw = '{:,.0f}'.format(bill_total['incurred'])
+    receivable = '{:,.0f}'.format(bill_total['receivable'])
     context = {
         'bills':bills,
         'code': code,
