@@ -234,7 +234,7 @@ class CartAdmin(admin.ModelAdmin):
 
     @admin.display(description='Cần thu')
     def receivable_(self, obj):
-        return'{:,.0f}'.format(obj.receivable_row)
+        return'{:,.0f}'.format(obj.receivable_raw)
 
     
     
