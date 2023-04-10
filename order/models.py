@@ -131,7 +131,7 @@ class Cart(models.Model):
     def str_total_raw(self):
         return '{:,.0f}'.format(self.total_raw)
     @property
-    def receivable_row(self):
+    def receivable_raw(self):
         total = self.total_raw - self.total_payment_raw
         return total
     
@@ -155,7 +155,10 @@ class CartItems(models.Model):
         if total == None:
             total = 0
         else:
-            total = total - self.discount
+            if self.discount ==None:
+                total = total
+            else:
+                total = total - self.discount
         return total
     
     @property

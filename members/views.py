@@ -15,7 +15,7 @@ def collect_cart_salary(info, month, year ):
     for mem in info:
         item = {}
         cart = Cart.objects.filter( user = mem['member'])
-        cart_cal = [item for item in cart if item.receivable_row == 0 
+        cart_cal = [item for item in cart if item.receivable_raw == 0 
                     and item.latest_paid.month == month 
                     and item.latest_paid.year == year]
         incurred = IncurredImcome.objects.filter(member = mem['member'],
@@ -36,7 +36,6 @@ def collect_cart_salary(info, month, year ):
         item['commission'] = '{:,.0f}'.format(total)
         item['incurred'] = '{:,.0f}'.format(total_incurred)
         item['imcome'] = '{:,.0f}'.format(mem['salary']+mem['subsidize']  +total_incurred+ total)
-
         hr.append(item)
     return hr
 

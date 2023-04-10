@@ -53,7 +53,7 @@ def get_total_values_bill(pk):
         incurred = qs.total_incurred_raw + incurred
         net_total = total_retail +incurred-discount
         paid = qs.total_payment_raw + paid 
-        receivable =qs.receivable_row
+        receivable =qs.receivable_raw
     bill_values['total_retail'] =total_retail
     bill_values['discount'] = discount
     bill_values['incurred'] = incurred
