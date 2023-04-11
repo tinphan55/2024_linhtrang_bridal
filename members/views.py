@@ -73,7 +73,7 @@ def paycheck(request, pk, month, year):
                     created_at__month=month,
                     created_at__year=year,
                     user = pk)
-    cart = [item for item in cart if item.receivable_row == 0]
+    cart = [item for item in cart if item.receivable_raw == 0]
     hr = collect_cart_salary(info,month, year)
     if len(hr)>0:
         hr = hr[0]
