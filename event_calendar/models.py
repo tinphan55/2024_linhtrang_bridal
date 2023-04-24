@@ -2,6 +2,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from order.models import Cart
+from django.db.models.signals import post_save
+from telegram import Bot
+from infobot import bot_token, chat_id
+from django.dispatch import receiver
 
 title_choices = (
     ('photo', 'Chụp hình'),
@@ -28,3 +32,14 @@ class Event(models.Model):
     def get_html_url(self):
         url = reverse('event_calendar:event_edit', args=(self.id,))
         return f'<a href="{url}"> {self.title} </a>'
+
+@receiver(post_save, sender=Event)
+def send_cart_message(sender, instance, created, **kwargs):
+    if created:
+        photo = Event.objects.get(pk =instance.pk )
+        bot = Bot(token=bot_token)
+        if instance.title == 'photo':
+            bot.send_message(
+                chat_id=chat_id, 
+                text= f"Có lịch chụp hình từ  {instance.start_time} đến {instance.end_time}") 
+

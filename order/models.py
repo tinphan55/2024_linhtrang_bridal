@@ -12,6 +12,11 @@ from django.conf import settings
 from itertools import chain
 from django.db.models import Max
 
+from django.db.models.signals import post_save
+from telegram import Bot
+from infobot import bot_token, chat_id
+from django.dispatch import receiver
+
 
 
 
@@ -354,3 +359,14 @@ class ReturnAccessory (AccessorysSerive):
 #         if form.is_valid():
 #             self.name.save()
 #             self.clothe.save_m2m()
+
+# Gửi tin nhắn telegram
+
+@receiver(post_save, sender=Cart)
+def send_cart_message(sender, instance, created, **kwargs):
+    if created:
+        bot = Bot(token=bot_token)
+        bot.send_message(
+                chat_id=chat_id, 
+                text= f"Có cart mới, tạo bởi {instance.user}, ngày cưới là {instance.wedding_date}, tổng tiền là {instance.str_total_raw}  ") 
+

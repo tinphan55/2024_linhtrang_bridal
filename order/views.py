@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.http import HttpResponse
 from django.template import loader
-from order.models import ClotheService, AccessorysSerive
+from order.models import *
 import datetime 
 from order.forms import CheckProductsForm
 from itertools import chain
@@ -10,6 +10,8 @@ from services_admin.function import available_qty_clothe_view, available_qty_acc
 from services_admin.models import Clothe, Accessory
 from django.utils.dateformat import DateFormat
 from django.http import Http404
+from django.http import JsonResponse
+from django.db.models import Q
 
 
 def define_id(code):
@@ -76,4 +78,16 @@ def index(request):
 
 
 
-
+def todaycart(request):
+    start_of_day = datetime.datetime.combine(datetime.datetime.now().date(), datetime.time.min)
+    end_of_day = datetime.datetime.combine(datetime.datetime.now().date(), datetime.time.max)
+    cart = Cart.objects.filter(
+        Q(created_at__gte=start_of_day) & Q(created_at__lte=end_of_day)
+            )
+    total_cart = sum(i.total_raw for i in cart)
+    total_paid = sum(i.total_payment_raw for i in cart)
+    response_data = {
+        'total_cart': '{:,.0f}'.format(total_cart),
+        'total_paid': '{:,.0f}'.format(total_paid)
+    }
+    return JsonResponse(response_data)
