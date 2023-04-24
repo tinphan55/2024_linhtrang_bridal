@@ -1,4 +1,4 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Dispatcher
+from telegram.ext import Updater, CommandHandler
 import os
 from telegram import Update
 from django.http import HttpResponse
@@ -16,7 +16,7 @@ def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Hello, I'm a bot!")
 
 def today(update, context):
-    response = requests.get('http://localhost:8000/gettodaycart/')
+    response = requests.get('http://linhtrangbridal.online/gettodaycart/')
     total_cart = response.json()['total_cart']
     total_paid = response.json()['total_paid']
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"Báo cáo hôm nay, tổng doanh thu {total_cart}, tổng tiền thu {total_paid }")
