@@ -4,7 +4,7 @@ from django.urls import reverse
 from order.models import Cart
 from django.db.models.signals import post_save
 from telegram import Bot
-from infobot import bot_token, chat_id
+from infobot import *
 from django.dispatch import receiver
 
 title_choices = (
@@ -37,9 +37,13 @@ class Event(models.Model):
 def send_cart_message(sender, instance, created, **kwargs):
     if created:
         photo = Event.objects.get(pk =instance.pk )
-        bot = Bot(token=bot_token)
+        bot = Bot(token=bot_truong)
         if instance.title == 'photo':
             bot.send_message(
-                chat_id=chat_id, 
-                text= f"Có lịch chụp hình từ  {instance.start_time} đến {instance.end_time}") 
+                chat_id=chat_group_id, 
+                text= f"Hi Trường, có lịch chụp hình từ  {instance.start_time} đến {instance.end_time}")
+            if instance.title =='makeup':
+                bot.send_message(
+                chat_id=chat_group_id, 
+                text= f"Hi Linh, có lịch trang điểm từ  {instance.start_time} đến {instance.end_time}")  
 

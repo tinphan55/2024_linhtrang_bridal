@@ -3,10 +3,9 @@ from django.template import loader
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from members.models import *
-from django.db.models import Q, F
+from django.db.models import Q, Count
 from members.forms import *
-from django.db.models.functions import ExtractMonth, ExtractYear
-from datetime import datetime
+
 
 
 # Create your views here.
@@ -14,7 +13,7 @@ def collect_cart_salary(info, month, year ):
     hr =[]
     for mem in info:
         item = {}
-        cart = Cart.objects.filter( user = mem['member'])
+        cart = Cart.objects.filter(user=mem['member']).annotate(num_payments=Count('paymentschedulecart')).exclude(num_payments=0)
         cart_cal = [item for item in cart if item.receivable_raw == 0 
                     and item.latest_paid.month == month 
                     and item.latest_paid.year == year]
@@ -32,7 +31,15 @@ def collect_cart_salary(info, month, year ):
         item['ranking'] = mem['ranking']
         item['salary'] = '{:,.0f}'.format( mem['salary'] )
         item['subsidize'] = '{:,.0f}'.format(mem['subsidize'])
-        total  = mem['commission_clothe']* total_clothe + mem['commission_photo']*total_photo + mem['commission_makup']*total_makup + mem['commission_accesory']*total_accessory
+        commission_clothe= mem['commission_clothe']* total_clothe
+        item['commission_clothe'] ='{:,.0f}'.format(commission_clothe)
+        commission_photo = mem['commission_photo']*total_photo
+        item['commission_photo']= '{:,.0f}'.format(commission_photo)
+        commission_makup=mem['commission_makup']*total_makup
+        item['commission_makup'] = '{:,.0f}'.format(commission_makup)
+        commission_accesory = mem['commission_accesory']*total_accessory
+        item['commission_accesory']='{:,.0f}'.format(commission_accesory)
+        total  = commission_clothe+ commission_photo +commission_makup  + commission_accesory
         item['commission'] = '{:,.0f}'.format(total)
         item['incurred'] = '{:,.0f}'.format(total_incurred)
         item['imcome'] = '{:,.0f}'.format(mem['salary']+mem['subsidize']  +total_incurred+ total)
