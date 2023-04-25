@@ -32,6 +32,10 @@ def collect_cart_salary(info, month, year ):
         item['salary'] = '{:,.0f}'.format( mem['salary'] )
         item['subsidize'] = '{:,.0f}'.format(mem['subsidize'])
         commission_clothe= mem['commission_clothe']* total_clothe
+        item['total_clothe'] = '{:,.0f}'.format(total_clothe)
+        item['total_photo']= '{:,.0f}'.format(total_photo)
+        item['total_makup']='{:,.0f}'.format(total_makup)
+        item['total_accessory'] = '{:,.0f}'.format(total_accessory)
         item['commission_clothe'] ='{:,.0f}'.format(commission_clothe)
         commission_photo = mem['commission_photo']*total_photo
         item['commission_photo']= '{:,.0f}'.format(commission_photo)
