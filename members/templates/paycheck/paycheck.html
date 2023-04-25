@@ -140,7 +140,35 @@
   </style>
 
 <hr/> 
-
+<b><strong class="white-text"> CHI TIẾT HOA HỒNG </strong></b>
+  <table class="table" style="border: 1px solid rgb(239, 221, 221); border-top-color:rgb(234, 228, 228);">
+      <thead>
+        <tr>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT cho thuê đồ</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH cho thuê đồ</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT chụp hình</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH chụp hình</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT trang điểm</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH trang điểm</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT phụ kiện</th>
+            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH phụ kiện</th>
+        </tr>
+        </thead>
+    <tbody>
+            <tr>
+                <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_clothe }}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_clothe}}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_photo}}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_photo}}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_makup}}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_makup}}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_accessory}}</td>
+              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_accesory}}</td>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+ 
 <b><strong class="white-text"> CHI TIẾT CART THU TIỀN ĐỦ TRONG THÁNG </strong></b>
 <table class="table" style="border: 1px solid rgb(239, 221, 221); border-top-color:rgb(234, 228, 228);">
     <thead>
@@ -175,35 +203,7 @@
   </table>
 
 
-  <b><strong class="white-text"> CHI TIẾT HOA HỒNG </strong></b>
-  <table class="table" style="border: 1px solid rgb(239, 221, 221); border-top-color:rgb(234, 228, 228);">
-      <thead>
-        <tr>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT cho thuê đồ</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH cho thuê đồ</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT chụp hình</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH chụp hình</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT trang điểm</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH trang điểm</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">DT phụ kiện</th>
-            <th style="border: 1px solid rgb(234, 228, 228); background-color: #e9f9ee;">HH phụ kiện</th>
-        </tr>
-        </thead>
-    <tbody>
-            <tr>
-                <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_clothe }}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_clothe}}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_photo}}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_photo}}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_makup}}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_makup}}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.total_accessory}}</td>
-              <td style="border: 1px solid rgb(234, 228, 228);">{{ hr.commission_accesory}}</td>
-              </td>
-            </tr>
-          </tbody>
-        </table>
- 
+  
   <tr>
     <td style="border: 1px solid rgb(234, 228, 228);">{{x.user.first_name }} {{x.user.last_name }}</td>
 
