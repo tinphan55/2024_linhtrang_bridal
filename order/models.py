@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, date
 from django.conf import settings
 from itertools import chain
 from django.db.models import Max
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from telegram import Bot
 from infobot import *
 from django.dispatch import receiver
@@ -365,10 +365,21 @@ class ReturnAccessory (AccessorysSerive):
 def send_cart_message(sender, instance, created, **kwargs):
     if created:
         bot = Bot(token= bot_truong)
-        cart = Cart.objects.get(pk = instance.pk)
-        paid = cart.total_payment_raw
-        total = cart.str_total_raw
         bot.send_message(
                 chat_id= chat_group_id, 
-                text= f"Tiền vô, có Cart tạo bởi {instance.user}, ngày cưới là {instance.wedding_date}, tổng bill là {total}, tổng tiền thu {paid}") 
+                text= f"Có Cart mới,tạo bởi {instance.user}, ngày cưới là {instance.wedding_date}") 
 
+@receiver(post_delete, sender=PaymentScheduleCart)
+def send_payment_message_on_delete(sender, instance, **kwargs):
+    bot = Bot(token=bot_truong)
+    text = f"[CẢNH BÁO] Thông tin thanh toán với số tiền {'{:,.0f}'.format(instance.amount)} của cart {instance.cart} đã bị xóa khỏi lịch thanh toán"
+    bot.send_message(chat_id=chat_group_id, text=text)
+
+@receiver(post_save, sender=PaymentScheduleCart)
+def send_payment_message_on_save(sender, instance, created, **kwargs):
+    bot = Bot(token=bot_truong)
+    if created:
+        text = f"Tiền vô, thêm {'{:,.0f}'.format(instance.amount)} đồng, được cập nhật bởi {instance.cart.user} cho cart {instance.cart}"
+    else:
+        text = f"[CẢNH BÁO] Thông tin thanh toán với số tiền {'{:,.0f}'.format(instance.amount)} của cart {instance.cart} đã được chỉnh sửa"
+    bot.send_message(chat_id=chat_group_id, text=text)
