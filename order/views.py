@@ -84,8 +84,11 @@ def todaycart(request):
     cart = Cart.objects.filter(
         Q(created_at__gte=start_of_day) & Q(created_at__lte=end_of_day)
             )
+    paid = PaymentScheduleCart.objects.filter(
+        Q(created_at__gte=start_of_day) & Q(created_at__lte=end_of_day)
+            )
     total_cart = sum(i.total_raw for i in cart)
-    total_paid = sum(i.total_payment_raw for i in cart)
+    total_paid = sum(i.amount for i in paid)
     response_data = {
         'total_cart': '{:,.0f}'.format(total_cart),
         'total_paid': '{:,.0f}'.format(total_paid)
