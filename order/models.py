@@ -26,7 +26,8 @@ class Cart(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, 
                                verbose_name="KH")
     created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
-    wedding_date= models.DateField(null=False, blank= False, verbose_name="Ngày cưới")
+    wedding_date= models.DateField(null=False, blank= False, verbose_name="Ngày cưới 1")
+    wedding_date_2= models.DateField(null=True, blank= True, verbose_name="Ngày cưới 2")
     note = models.TextField(max_length=500, null= True, blank=True, verbose_name="Ghi chú")
     incurred = models.IntegerField(null= True, blank=True, default=0, verbose_name="Phát sinh")
     total_price = models.FloatField(default=0, verbose_name='Tổng tiền')
