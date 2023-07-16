@@ -199,14 +199,20 @@ class ClotheService(CartItems):
     
     def save(self, *args, **kwargs):
         self.price = self.clothe.price
+        # Đặt giá trị vô cùng lớn và vô cùng nhỏ cho NoneType
+        INFINITY_DATE = date.max
+        MINUS_INFINITY_DATE = date.min
+        max_wedding_date = max(self.cart.wedding_date or MINUS_INFINITY_DATE,self.cart.wedding_date_2 or MINUS_INFINITY_DATE)
+        min_wedding_date = min(self.cart.wedding_date or INFINITY_DATE, self.cart.wedding_date_2 or INFINITY_DATE)
+        # max_date = max(wedding_date or MINUS_INFINITY_DATE, wedding_date2 or MINUS_INFINITY_DATE)
         if self.is_discount == True:
             self.discount = self.clothe.ranking.discount * self.qty
         else:
             self.discount = 0
         if self.delivery_date == None:
-            self.delivery_date = self.cart.wedding_date - timedelta(days=2)
+            self.delivery_date = min_wedding_date - timedelta(days=2)
         if self.return_date == None:
-            self.return_date = self.cart.wedding_date + timedelta(days=2) 
+            self.return_date = max_wedding_date + timedelta(days=2) 
         super(ClotheService, self).save(*args, **kwargs)
     
     @property
@@ -224,6 +230,7 @@ class ClotheService(CartItems):
             status = "Đã thu hồi"
         return status
     
+
 
 class PhotoService(CartItems):
     package = models.ForeignKey(Photo, on_delete = models.CASCADE, 
@@ -279,14 +286,18 @@ class AccessorysSerive (CartItems):
     
     def save(self, *args, **kwargs):
         self.price = self.product.price
+        INFINITY_DATE = date.max
+        MINUS_INFINITY_DATE = date.min
+        max_wedding_date = max(self.cart.wedding_date or MINUS_INFINITY_DATE,self.cart.wedding_date_2 or MINUS_INFINITY_DATE)
+        min_wedding_date = min(self.cart.wedding_date or INFINITY_DATE, self.cart.wedding_date_2 or INFINITY_DATE)
         if self.is_discount == True:
              self.discount = self.product.discount * self.qty
         else:
             self.discount = 0
         if self.delivery_date == None:
-            self.delivery_date = self.cart.wedding_date - timedelta(days=2)
+            self.delivery_date = min_wedding_date - timedelta(days=2)
         if self.return_date == None:
-            self.return_date = self.cart.wedding_date + timedelta(days=2) 
+            self.return_date = max_wedding_date + timedelta(days=2) 
         today = date.today()
         super(AccessorysSerive, self).save(*args, **kwargs)
     
@@ -361,6 +372,24 @@ class ReturnAccessory (AccessorysSerive):
 #             self.clothe.save_m2m()
 
 # Gửi tin nhắn telegram
+
+@receiver(post_save, sender=Cart)
+def update_manage_clothe(sender, instance, created, **kwargs):
+        INFINITY_DATE = date.max
+        MINUS_INFINITY_DATE = date.min
+        max_wedding_date = max(instance.wedding_date or MINUS_INFINITY_DATE,instance.wedding_date_2 or MINUS_INFINITY_DATE)
+        min_wedding_date = min(instance.wedding_date or INFINITY_DATE, instance.wedding_date_2 or INFINITY_DATE)
+        clothe = ClotheService.objects.filter(cart = instance.pk)
+        accessory = AccessorysSerive.objects.filter(cart = instance.pk)
+        for item in clothe:
+            item.delivery_date = min_wedding_date - timedelta(days=2)
+            item.return_date = max_wedding_date + timedelta(days=2)
+            item.save()
+        for item in accessory:
+            item.delivery_date = min_wedding_date - timedelta(days=2)
+            item.return_date = max_wedding_date + timedelta(days=2)
+            item.save()
+
 
 @receiver(post_save, sender=Cart)
 def send_cart_message(sender, instance, created, **kwargs):
