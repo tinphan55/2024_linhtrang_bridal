@@ -14,11 +14,16 @@ from dateutil.relativedelta import relativedelta
 class ClotheServiceInline(admin.StackedInline):
     form = ClotheServiceForm
     model= ClotheService
-    fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_']
-    readonly_fields = ['total_items_',]
+    fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_','total_deposit_str']
+    readonly_fields = ['total_items_','total_deposit_str']
+    
     @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
         return obj.str_total_items
+    
+    @admin.display(description='Đặt cọc')
+    def total_deposit_str(self,obj):
+        return '{:,.0f}'.format( obj.total_deposit)
     
 @admin.action(description='Xác nhận sản phẩm được trả')
 def confirm_returned(modeladmin, request, queryset):
@@ -143,26 +148,35 @@ class PhotoScheduleInline(admin.StackedInline):
     model =  Event 
     extra = 1
     fields = ['title','start_time','end_time','description']
+    
    
 
 class MakeupServiceInline(admin.StackedInline):
     model =  MakeupService
-    fields = ['package','note','is_discount','total_items_']
+    fields = ['package','note','is_discount','total_items_','total_deposit_str']
     #raw_id_fields = ['product']
-    readonly_fields = ['total_items_',]
+    readonly_fields = ['total_items_','total_deposit_str']
     extra = 1
     @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
         return obj.str_total_items
+    
+    @admin.display(description='Đặt cọc')
+    def total_deposit_str(self,obj):
+        return '{:,.0f}'.format( obj.total_deposit)
+    
 
 class AccessoryServiceInline(admin.StackedInline):
     model =  AccessorysSerive
-    fields = ['product','qty','is_discount','total_items_', 'delivery_date', 'return_date']
+    fields = ['product','qty','is_discount','total_items_', 'delivery_date', 'return_date','total_deposit_str']
     #raw_id_fields = ['product']
-    readonly_fields = ['total_items_',]
+    readonly_fields = ['total_items_','total_deposit_str']
     @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
         return obj.str_total_items
+    @admin.display(description='Đặt cọc')
+    def total_deposit_str(self,obj):
+        return '{:,.0f}'.format( obj.total_deposit)
     
 
     
@@ -170,12 +184,17 @@ class AccessoryServiceInline(admin.StackedInline):
 
 class PhotoServiceInline(admin.StackedInline):
     model = PhotoService 
-    fields = ['package','is_discount','note','total_items_']
-    readonly_fields = ['total_items_', ]
+    fields = ['package','is_discount','note','total_items_','total_deposit_str']
+    readonly_fields = ['total_items_', 'total_deposit_str']
     extra = 1
     @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
         return obj.str_total_items
+    @admin.display(description='Đặt cọc')
+    def total_deposit_str(self,obj):
+        return '{:,.0f}'.format( obj.total_deposit)
+    
+
 
 class IncurredCartInline(admin.StackedInline):
     form = IncurredCartForm
@@ -195,12 +214,12 @@ class PaymentCartInline(admin.StackedInline):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_', 'wedding_date','wedding_date_2')
-    fields = ['user','client','wedding_date','wedding_date_2','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_']
+    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit', 'wedding_date','wedding_date_2')
+    fields = ['user','client','wedding_date','wedding_date_2','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_','total_deposit']
     list_display_links=('client',)
     search_fields=('client__phone',)
      #['created_at','wedding_date',]
-    readonly_fields = [ 'created_at','total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_']
+    readonly_fields = [ 'created_at','total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit']
     list_filter = ('created_at','user__username', 'client__full_name')
     inlines = [PaymentCartInline,ClotheServiceInline,PhotoServiceInline, MakeupServiceInline, AccessoryServiceInline,IncurredCartInline,PhotoScheduleInline]
     
@@ -235,6 +254,10 @@ class CartAdmin(admin.ModelAdmin):
     @admin.display(description='Cần thu')
     def receivable_(self, obj):
         return'{:,.0f}'.format(obj.receivable_raw)
+    
+    @admin.display(description='Cần đặt cọc')
+    def total_deposit(self, obj):
+        return'{:,.0f}'.format(obj.total_deposit_raw)
 
     
     

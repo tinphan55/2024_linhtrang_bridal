@@ -140,6 +140,19 @@ class Cart(models.Model):
         total = self.total_raw - self.total_payment_raw
         return total
     
+    @property
+    def total_deposit_raw(self):
+        clothe_items = ClotheService.objects.filter(cart_id = self.pk )
+        clothe =sum(i.total_deposit for i in clothe_items )
+        photo_items = PhotoService.objects.filter(cart_id = self.pk )
+        photo =sum(i.total_deposit for i in photo_items )
+        makeup_items = MakeupService.objects.filter(cart_id = self.pk )
+        makup = sum(i.total_deposit for i in makeup_items )
+        accessory_items= AccessorysSerive.objects.filter(cart_id = self.pk )
+        acces = sum(i.total_deposit for i in accessory_items)
+        return clothe + photo +acces + makup
+        
+
     
     
 
@@ -165,6 +178,8 @@ class CartItems(models.Model):
             else:
                 total = total - self.discount
         return total
+    
+    
     
     @property
     def str_price(self):
@@ -230,6 +245,11 @@ class ClotheService(CartItems):
             status = "Đã thu hồi"
         return status
     
+    @property
+    def total_deposit(self):
+        deposit = self.clothe.deposit
+        return deposit*self.qty
+    
 
 
 class PhotoService(CartItems):
@@ -250,6 +270,10 @@ class PhotoService(CartItems):
         else:
             self.discount = 0
         super(PhotoService, self).save(*args, **kwargs)
+    @property
+    def total_deposit(self):
+        deposit = self.package.deposit
+        return deposit*self.qty
 
     
 class MakeupService(CartItems):
@@ -268,6 +292,10 @@ class MakeupService(CartItems):
         super(MakeupService, self).save(*args, **kwargs)
     def __str__(self):
         return str(self.package)
+    @property
+    def total_deposit(self):
+        deposit = self.package.deposit
+        return deposit*self.qty
 
 class AccessorysSerive (CartItems):
     product = models.ForeignKey(Accessory, on_delete = models.CASCADE, 
@@ -315,6 +343,10 @@ class AccessorysSerive (CartItems):
         else:
             status = "Đã thu hồi"
         return status
+    @property
+    def total_deposit(self):
+        deposit = self.product.deposit
+        return deposit*self.qty
     
 class IncurredCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  

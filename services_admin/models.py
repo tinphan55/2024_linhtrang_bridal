@@ -27,7 +27,7 @@ class Ranking (models.Model):
     description = models.CharField(max_length= 100, null=True, blank=True)
     price = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
-    
+    deposit = models.IntegerField(default=0)
     
     def __str__(self):
         return str(self.category) +'_' + str(self.type)+ '_' +str(self.rank)
@@ -42,6 +42,7 @@ class ItemBase (models.Model):
     is_available = models.BooleanField(default=True)   
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+    deposit = models.IntegerField(default=0)
     tags = models.ManyToManyField('Tag', blank=True, null=True)
 
     class Meta:
@@ -52,6 +53,7 @@ class ItemBase (models.Model):
     
     def save(self, *args, **kwargs):
         self.category = Ranking.objects.get(id=self.ranking_id).category
+        self.deposit = self.ranking.deposit
         #self.price = Ranking.objects.get(id=self.ranking_id).price
         super(ItemBase, self).save(*args, **kwargs)
     
@@ -67,13 +69,10 @@ class Clothe(ItemBase):
     def save(self, *args, **kwargs):
         self.price = self.ranking.price
         self.discount = self.ranking.discount
+        self.deposit = self.ranking.deposit
         super(ItemBase, self).save(*args, **kwargs)
 
-@receiver(post_save, sender=Ranking)
-def update_clothes(sender, instance, **kwargs):
-    items = Clothe.objects.filter(ranking=instance)
-    for item in items:
-        item.save()
+
 
 class Photo(ItemBase):  
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=2)
@@ -97,6 +96,8 @@ class Makeup(ItemBase):
     def __str__(self):
         return self.name
     
+   
+    
 class Accessory(models.Model):
     name = models.CharField(max_length=50,null=False, blank=False, unique=True )
     ranking = models.ForeignKey(Ranking,on_delete=models.CASCADE, blank=True, null=True )
@@ -111,13 +112,25 @@ class Accessory(models.Model):
     tags = models.ManyToManyField('Tag', blank=True, null=True)
     is_sell = models.BooleanField(default=False)
     is_hr = models.BooleanField(default=False)
+    deposit = models.IntegerField(default=0)
     #date_check = models.DateField(null = True, blank= True, default= datetime.now())
   
 
     def __str__(self):
         return self.name
 
-
+@receiver(post_save, sender=Ranking)
+def update_product(sender, instance, **kwargs):
+    clothes = Clothe.objects.filter(ranking=instance)
+    photos = Photo.objects.filter(ranking=instance)
+    makups = Makeup.objects.filter(ranking=instance)
+    for item in clothes:
+        item.save()
+    for item in photos:
+        item.save()
+    for item in makups:
+        item.save()
+    
 
 
 class Tag (models.Model):

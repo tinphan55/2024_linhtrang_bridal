@@ -25,7 +25,7 @@ class ClotheAdminView(admin.ModelAdmin):
         form = super(ClotheAdminView, self).get_form(request, obj, **kwargs)
         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=1)
         return form 
-    list_display = ('code','name','ranking','available_qty','return_qty','order_qty','price', 'discount','is_available','color')
+    list_display = ('code','name','ranking','available_qty','return_qty','order_qty','price', 'discount','deposit','is_available','color')
     fields = ('code','name','ranking','qty', 'is_available','color','description','tags' )
     list_display_links = ('name',)
     search_fields = ('code', )
@@ -57,8 +57,8 @@ class PhotoAdmin(admin.ModelAdmin):
         form = super(PhotoAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=2)
         return form 
-    list_display = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file', 'is_album','price','discount', 'is_available')
-    fields = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file','is_album','price','discount', 'is_available','description' ,'tags')
+    list_display = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file', 'is_album','price','discount','deposit', 'is_available')
+    fields = ('name','ranking','number_location','number_gate_photo','small_photo','origin_file','edit_file','is_album','price','discount','deposit', 'is_available','description' ,'tags')
     list_display_links = ('name',)
     search_fields = ('name',)
     readonly_fields =('category',)
@@ -70,8 +70,8 @@ class MakeupAdmin(admin.ModelAdmin):
         form = super(MakeupAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['ranking'].queryset = Ranking.objects.filter(category=3)
         return form 
-    list_display = ('name','ranking','re_makup','price','discount', 'is_available')
-    fields = ('name','ranking','re_makup','price','discount', 'is_available','description', 'tags' )
+    list_display = ('name','ranking','re_makup','price','discount','deposit', 'is_available')
+    fields = ('name','ranking','re_makup','price','discount','deposit', 'is_available','description', 'tags' )
     list_display_links = ('name',)
     search_fields = ('name',)
     readonly_fields =('category',)
@@ -83,8 +83,8 @@ class AccessoryAdmin(admin.ModelAdmin):
          form = super(AccessoryAdmin, self).get_form(request, obj, **kwargs)
          form.base_fields['ranking'].queryset = Ranking.objects.filter(category=4)
          return form 
-     list_display = ('id','name','ranking','is_sell','price','discount','qty_available','is_hr', 'is_available')
-     fields = ('name','ranking','is_sell','qty','price', 'discount','is_available','description','is_hr' , 'tags')
+     list_display = ('id','name','ranking','is_sell','price','discount', 'deposit','qty_available','is_hr', 'is_available')
+     fields = ('name','ranking','is_sell','qty','price', 'discount','deposit','is_available','description','is_hr' , 'tags')
      list_display_links = ('name',)
      search_fields = ('name',)
      list_filter=('is_sell',)
@@ -106,7 +106,7 @@ class AccessoryAdmin(admin.ModelAdmin):
 
 
 class RankingAdmin(admin.ModelAdmin):
-    list_display = ('id','rank','type','price','discount', 'category', 'description')
+    list_display = ('id','rank','type','price','discount', 'deposit','category', 'description')
     list_display_links = ('id', 'rank')
     list_filter = ('category',)
     search_fields = ('rank',)
