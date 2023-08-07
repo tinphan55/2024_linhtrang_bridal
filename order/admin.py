@@ -5,10 +5,13 @@ from order.models import *
 from django.db.models import  Sum
 from event_calendar.models import Event
 from datetime import datetime, timedelta, date
+
 from order.forms import *
 from django.db.models import Q
 from members.models import Member
 from dateutil.relativedelta import relativedelta
+from services_admin.function import *
+
 
 
 class ClotheServiceInline(admin.StackedInline):
@@ -16,7 +19,42 @@ class ClotheServiceInline(admin.StackedInline):
     model= ClotheService
     fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_','total_deposit_str']
     readonly_fields = ['total_items_','total_deposit_str']
+    from datetime import timedelta
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "clothe":
+            cart_id = request.resolver_match.kwargs.get('object_id')
+            clothe = Clothe.objects.filter(is_available=True)
+            if cart_id:
+                cart = Cart.objects.get(pk=cart_id)
+                selected_clothes = Clothe.objects.filter(clotheservice__cart=cart) 
+                wed1 = cart.wedding_date
+                wed2 = cart.wedding_date_2
+                INFINITY_DATE = date.max
+                MINUS_INFINITY_DATE = date.min
+                max_wedding = max(wed1 or MINUS_INFINITY_DATE, wed2 or MINUS_INFINITY_DATE)
+                min_wedding = min(wed1 or INFINITY_DATE, wed2 or INFINITY_DATE)
+                delivery = min_wedding - timedelta(days=2)
+                receive = max_wedding + timedelta(days=2) 
+                check_date = [delivery, min_wedding, max_wedding, receive]
+                # Tạo một danh sách các pk của các Clothe có sẵn và đáp ứng điều kiện
+                available_clothe_pks = [
+                    item.pk for item in clothe 
+                    if all(available_qty_clothe_view(item.pk, date) > 0 for date in check_date)
+                ]
+                # Tạo queryset kết hợp giữa selected_clothes và clothe
+                combined_queryset = (selected_clothes | clothe.filter(pk__in=available_clothe_pks)).distinct()
+                kwargs["queryset"] = combined_queryset
+            else:
+                kwargs["queryset"] = Clothe.objects.none()
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
     
+
+        
+
     @admin.display(description='Tổng tiền')
     def total_items_(self,obj):
         return obj.str_total_items
@@ -215,7 +253,7 @@ class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
     list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit', 'wedding_date','wedding_date_2')
-    fields = ['user','client','wedding_date','wedding_date_2','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_','total_deposit']
+    fields = ['client','wedding_date','wedding_date_2','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_','total_deposit']
     list_display_links=('client',)
     search_fields=('client__phone',)
      #['created_at','wedding_date',]
@@ -223,6 +261,12 @@ class CartAdmin(admin.ModelAdmin):
     list_filter = ('created_at','user__username', 'client__full_name')
     inlines = [PaymentCartInline,ClotheServiceInline,PhotoServiceInline, MakeupServiceInline, AccessoryServiceInline,IncurredCartInline,PhotoScheduleInline]
     
+
+    def save_model(self, request, obj, form, change):
+        # Override phương thức save_model để tự động lưu trường user là người dùng đang đăng nhập
+        obj.user = request.user
+        obj.save()
+
     def image_tag(self, obj):
         member = Member.objects.filter(id_member_id =obj.user_id).first()
         if member is not None and member.avatar:

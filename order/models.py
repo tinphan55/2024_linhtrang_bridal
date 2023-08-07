@@ -21,7 +21,7 @@ from django.dispatch import receiver
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True, blank= True, 
                              verbose_name="Người tạo")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, 
                                verbose_name="KH")

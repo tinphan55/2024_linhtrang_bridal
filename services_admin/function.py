@@ -75,7 +75,7 @@ def available_qty_clothe_view(pk, date_check):
         order_qty= 0
     volatility_qty = ClotheService.objects.filter(
         clothe__id=pk,
-        return_date__lte=date_check,
+        return_date__lt=date_check,
         return_date__gte=start_date
             ).aggregate(Sum('qty'))['qty__sum']
     if volatility_qty is not None:
@@ -89,7 +89,6 @@ def available_qty_accessory_view(pk, date_check):
     item = Accessory.objects.get(pk=pk)
     start_date = item.created_date
     qty_begin = item.qty
-    item.is_sell
     end_date = datetime.now()
     is_sell = item.is_sell
     if item.is_sell == True:
@@ -115,7 +114,7 @@ def available_qty_accessory_view(pk, date_check):
             order_qty= 0
         volatility_qty = AccessorysSerive.objects.filter(
             product__id=pk,
-            return_date__lte= date_check, 
+            return_date__lt= date_check, 
             return_date__gte =start_date
                 ).aggregate(Sum('qty'))['qty__sum']
         if volatility_qty is not None:
