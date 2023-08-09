@@ -165,7 +165,11 @@ class CartItems(models.Model):
     qty = models.IntegerField(default=1, verbose_name="Số lượng")
     discount = models.IntegerField(null= True, blank=True, default=0,verbose_name= "Giảm giá")
     is_discount = models.BooleanField(default=False, verbose_name="Có giảm giá")  
-    #total_items = models.IntegerField(default=0, verbose_name="Tổng tiền")
+    total_items = models.IntegerField(default=0, verbose_name="Tổng tiền")
+    str_total_items = models.CharField(max_length=50,null= True, blank=True, verbose_name="Tổng tiền")
+    str_price = models.CharField(max_length=50,null= True, blank=True, verbose_name="Giá")
+    str_discount = models.CharField(max_length=50,null= True, blank=True, verbose_name="Giảm giá")
+    
 
     @property
     def total_items(self):
@@ -205,6 +209,10 @@ class ClotheService(CartItems):
     returned_at = models.DateTimeField(null=True, blank=True,verbose_name= "Ngày trả")  
     note = models.TextField(max_length=500, null = True, blank=True, verbose_name="Ghi chú")
     noti = models.CharField (max_length=200, verbose_name='Thông báo')
+    item_status  = models.CharField(max_length=50,null= True, blank=True, verbose_name="Trạng thái")
+    total_deposit  = models.CharField(max_length=50,null= True, blank=True, verbose_name="Tổng đặt cọc")
+
+
     class Meta:
         verbose_name = 'Cho thuê đồ cưới'
         verbose_name_plural = 'Cho thuê đồ cưới'
@@ -250,6 +258,10 @@ class ClotheService(CartItems):
         deposit = self.clothe.deposit
         return deposit*self.qty
     
+# @receiver(post_save, sender=ClotheService)
+# def save_clothe_service(sender, instance, created, **kwargs):
+
+              
 
 
 class PhotoService(CartItems):
