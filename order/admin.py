@@ -17,8 +17,8 @@ from services_admin.function import *
 class ClotheServiceInline(admin.StackedInline):
     form = ClotheServiceForm
     model= ClotheService
-    fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_','total_deposit_str']
-    readonly_fields = ['total_items_','total_deposit_str']
+    fields = ['clothe','qty','is_discount','delivery_date','return_date','str_total_items','total_deposit_str']
+    readonly_fields = ['str_total_items','total_deposit_str']
     from datetime import timedelta
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -51,17 +51,8 @@ class ClotheServiceInline(admin.StackedInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-    
 
-        
-
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
     
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
     
 @admin.action(description='Xác nhận sản phẩm được trả')
 def confirm_returned(modeladmin, request, queryset):
@@ -191,46 +182,28 @@ class PhotoScheduleInline(admin.StackedInline):
 
 class MakeupServiceInline(admin.StackedInline):
     model =  MakeupService
-    fields = ['package','note','is_discount','total_items_','total_deposit_str']
+    fields = ['package','note','is_discount','str_total_items','total_deposit_str']
     #raw_id_fields = ['product']
-    readonly_fields = ['total_items_','total_deposit_str']
+    readonly_fields = ['str_total_items','total_deposit_str']
     extra = 1
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
+ 
+
     
 
 class AccessoryServiceInline(admin.StackedInline):
     model =  AccessorysSerive
-    fields = ['product','qty','is_discount','total_items_', 'delivery_date', 'return_date','total_deposit_str']
+    fields = ['product','qty','is_discount','str_total_items', 'delivery_date', 'return_date','total_deposit_str']
     #raw_id_fields = ['product']
-    readonly_fields = ['total_items_','total_deposit_str']
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
+    readonly_fields = ['str_total_items','total_deposit_str']
     
 
-    
-    
 
 class PhotoServiceInline(admin.StackedInline):
     model = PhotoService 
-    fields = ['package','is_discount','note','total_items_','total_deposit_str']
-    readonly_fields = ['total_items_', 'total_deposit_str']
+    fields = ['package','is_discount','note','str_total_items','total_deposit_str']
+    readonly_fields = ['str_total_items', 'total_deposit_str']
     extra = 1
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
+   
     
 
 
@@ -252,12 +225,12 @@ class PaymentCartInline(admin.StackedInline):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit', 'wedding_date','wedding_date_2')
-    fields = ['client','wedding_date','wedding_date_2','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_','total_deposit']
+    list_display=('id','image_tag','user','client','created_at', 'str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable','str_total_deposit', 'wedding_date','wedding_date_2')
+    fields = ['client','wedding_date','wedding_date_2','note','str_total_cart', 'str_total_discount','str_total_incurred', 'str_total','str_total_payment', 'str_receivable','str_total_deposit']
     list_display_links=('client',)
     search_fields=('client__phone',)
      #['created_at','wedding_date',]
-    readonly_fields = [ 'created_at','total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit']
+    readonly_fields = [ 'created_at','str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable','str_total_deposit']
     list_filter = ('created_at','user__username', 'client__full_name')
     inlines = [PaymentCartInline,ClotheServiceInline,PhotoServiceInline, MakeupServiceInline, AccessoryServiceInline,IncurredCartInline,PhotoScheduleInline]
     
@@ -276,37 +249,8 @@ class CartAdmin(admin.ModelAdmin):
 
     image_tag.short_description = 'avatar'
 
-    @admin.display(description='Tổng trước giảm')
-    def total_cart(self, obj):
-        return '{:,.0f}'.format(obj.total_cart_raw)
-
-    @admin.display(description='Tổng phát sinh')
-    def total_incurred(self, obj):
-        return '{:,.0f}'.format(obj.total_incurred_raw)
-    @admin.display(description='Tổng giảm')
-    def total_discount (self, obj):
-        return '{:,.0f}'.format(obj.total_discount_raw)
-    
-    @admin.display(description='Tổng sau giảm')
-    def total(self, obj):
-        return '{:,.0f}'.format(obj.total_raw)
-
-    @admin.display(description='Tổng trả')
-    def paid_(self, obj):
-        return '{:,.0f}'.format(obj.total_payment_raw)
-
-    @admin.display(description='Cần thu')
-    def receivable_(self, obj):
-        return'{:,.0f}'.format(obj.receivable_raw)
-    
-    @admin.display(description='Cần đặt cọc')
-    def total_deposit(self, obj):
-        return'{:,.0f}'.format(obj.total_deposit_raw)
-
-    
-    
-
    
+
 
 admin.site.register(Cart,CartAdmin )
 admin.site.register(ReturnClothe, ReturnClotheAdmin)
