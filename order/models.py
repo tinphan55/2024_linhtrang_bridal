@@ -435,18 +435,17 @@ def update_clothe_rental_info(sender, instance, **kwargs):
                 delivery_date__lte=date,
                 return_date__gte=date
             ).aggregate(total_qty=Sum('qty'))['total_qty'] or 0
-            
+            avai_qty = max(inital_qty - total_rental_qty, 0)
             # Tạo hoặc cập nhật thông tin thuê cho Clothe mới
             ClotheRentalInfo.objects.create(
                 clothe=instance.clothe,
                 rental_date=date,
                 qty = total_rental_qty,
-                available_qty = inital_qty -total_rental_qty
+                available_qty = avai_qty
 
                 )
             old_clothe = ClotheRentalInfo.objects.filter(rental_date=date, clothe=previous_clothe_id).first()
             if old_clothe:
-                
                 if not created and previous_clothe_id != instance.pk:  
                     if  previous_clothe_id:  
                         if instance.previous_clothe_qty==0 or previous_clothe_id is None or instance.previous_clothe_qty != instance.qty :
