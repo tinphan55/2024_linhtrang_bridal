@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, date
 from django.conf import settings
 from itertools import chain
 from django.db.models import Max
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete,pre_save
 from telegram import Bot
 from infobot import *
 from django.dispatch import receiver
@@ -23,6 +23,8 @@ from django.dispatch import receiver
 class Cart(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True, blank= True, 
                              verbose_name="Người tạo")
+    user_modified = models.CharField(max_length=150, blank=True, null=True,
+                             verbose_name="Người chỉnh sửa")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, 
                                verbose_name="KH")
     created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
@@ -126,8 +128,9 @@ class ClotheService(CartItems):
     note = models.TextField(max_length=500, null = True, blank=True, verbose_name="Ghi chú")
     noti = models.CharField (max_length=200, verbose_name='Thông báo')
     # item_status  = models.CharField(max_length=50,null= True, blank=True, verbose_name="Trạng thái")
-    
-
+    previous_clothe_id = models.PositiveIntegerField(null=True, blank=True)
+    previous_clothe_qty = models.PositiveIntegerField(default=0,null=True, blank=True)
+   
 
     class Meta:
         verbose_name = 'Cho thuê đồ cưới'
@@ -135,6 +138,12 @@ class ClotheService(CartItems):
     
     def __str__(self):
         return str(self.clothe)
+    
+    def __init__(self, *args, **kwargs):
+        super(ClotheService, self).__init__(*args, **kwargs)
+        self._original_qty = self.qty  # Lưu giá trị qty ban đầu
+        self._original_clothe_id = self.clothe_id  # Lưu giá trị clothe_id ban đầu
+    
     
     @property
     def item_status(self):
@@ -181,19 +190,17 @@ class ClotheService(CartItems):
         else:
             self.total_deposit =total_deposit
         self.total_deposit_str  ='{:,.0f}'.format( self.total_deposit)
-        today = date.today()
-        if today < self.delivery_date:
-            status = "Chờ cho thuê"
-        elif today >= self.delivery_date and self.returned_at is None:
-            if today <= self.return_date:
-                status = "Đang cho thuê"
-            elif today > self.return_date:
-                num_date = today - self.return_date
-                status = f"QUÁ HẠN THUÊ {num_date.days} NGÀY"
-            else:
-                status = "Đã thu hồi"
-        self.item_status = status
+        if self.qty != self._original_qty:
+            self.previous_clothe_qty = self._original_qty  # Lưu qty cũ
+        if self.clothe_id != self._original_clothe_id:
+            self.previous_clothe_id = self._original_clothe_id  # Lưu clothe_id cũ
+           
+        
         super(ClotheService, self).save(*args, **kwargs)
+        # Cập nhật giá trị ban đầu sau khi đã lưu
+        self._original_qty = self.qty
+        self._original_clothe_id = self.clothe_id
+        
 
     
 
@@ -319,18 +326,6 @@ class AccessorysSerive (CartItems):
             self.delivery_date = min_wedding_date - timedelta(days=2)
         if self.return_date == None:
             self.return_date = max_wedding_date + timedelta(days=2) 
-        today = date.today()
-        if today < self.delivery_date:
-            status = "Chờ cho thuê"
-        elif today >= self.delivery_date and self.returned_at is None:
-            if today <= self.return_date:
-                status = "Đang cho thuê"
-            elif today > self.return_date:
-                num_date = today - self.return_date
-                status = f"QUÁ HẠN THUÊ {num_date.days} NGÀY"
-        else:
-            status = "Đã thu hồi"
-        self.item_status = status
         total_deposit = self.product.deposit*self.qty
         if total_deposit is None:
             self.total_deposit=0
@@ -386,16 +381,92 @@ class ReturnAccessory (AccessorysSerive):
         return super().get_queryset().filter(product__is_sell=False)
     def __str__(self):
         return str(self.product.name)
+    
+class ClotheRentalInfo(models.Model):
+    clothe = models.ForeignKey(Clothe, on_delete=models.CASCADE)
+    rental_date = models.DateField()
+    qty = models.PositiveIntegerField(default=1)
+    available_qty = models.PositiveIntegerField(null=True, blank=True)
+    class Meta:
+        unique_together = ( 'clothe', 'rental_date')
+    def __str__(self):
+        return str(self.clothe.code)+str('_')+str(self.rental_date)
 
-# class CartCombo (models.Model):
-#     name = models.CharField(max_length=100)
-#     clothe = models.ManyToManyField(Clothe)
-#     def save_model(self, request, form):
-#         if form.is_valid():
-#             self.name.save()
-#             self.clothe.save_m2m()
 
-# Gửi tin nhắn telegram
+# @receiver(pre_save, sender=ClotheService)
+# def update_previous_clothe_id(sender, instance, **kwargs):
+#     try:
+#         # Lấy ClotheService trước đó (nếu có)
+#         previous_instance = ClotheService.objects.get(pk=instance.pk)
+#         if previous_instance.clothe != instance.clothe:
+#             instance.previous_clothe_id = previous_instance.clothe_id
+#     except ClotheService.DoesNotExist:
+#         pass  # Đối tượng mới được tạo, không cần xử lý 
+
+
+
+
+
+@receiver([post_save, post_delete], sender=ClotheService)
+def update_clothe_rental_info(sender, instance, **kwargs):
+    created = kwargs.get('created', False)
+    if instance.clothe.is_available:  # Chỉ xử lý nếu Clothe có sẵn
+        delivery_start_date = instance.delivery_date 
+        return_end_date = instance.return_date 
+        inital_qty = instance.clothe.qty
+        
+        rental_dates = []
+        current_date = delivery_start_date
+        
+        while current_date <= return_end_date:
+            rental_dates.append(current_date)
+            current_date += timedelta(days=1)
+        
+        existing_rental_info = ClotheRentalInfo.objects.filter(clothe=instance.clothe, rental_date__in=rental_dates)
+        existing_rental_info.delete()
+        
+        # Lấy previous_clothe_id
+        previous_clothe_id = instance.previous_clothe_id
+        
+        for date in rental_dates:
+            # Tính toán tổng số lượng cho mỗi ngày thuê cho Clothe
+            total_rental_qty = ClotheService.objects.filter(
+                clothe = instance.clothe,  # Sử dụng previous_clothe_id
+                delivery_date__lte=date,
+                return_date__gte=date
+            ).aggregate(total_qty=Sum('qty'))['total_qty'] or 0
+            
+            # Tạo hoặc cập nhật thông tin thuê cho Clothe mới
+            ClotheRentalInfo.objects.create(
+                clothe=instance.clothe,
+                rental_date=date,
+                qty = total_rental_qty,
+                available_qty = inital_qty -total_rental_qty
+
+                )
+            old_clothe = ClotheRentalInfo.objects.filter(rental_date=date, clothe=previous_clothe_id).first()
+            if old_clothe:
+                
+                if not created and previous_clothe_id != instance.pk:  
+                    if  previous_clothe_id:  
+                        if instance.previous_clothe_qty==0 or previous_clothe_id is None or instance.previous_clothe_qty != instance.qty :
+                                new_qty = old_clothe.qty - instance.qty
+                        else:
+                                new_qty = old_clothe.qty - instance.previous_clothe_qty
+                    
+                if new_qty <0:
+                    new_qty = 0
+                ClotheRentalInfo.objects.update_or_create(
+                                    rental_date=date,  
+                                    clothe=previous_clothe_id,
+                                    defaults={
+                                        'qty': new_qty,
+                                        'available_qty': inital_qty - new_qty}
+                                )
+            
+
+
+        
 
 
 # Nếu đổi ngày cưới phải vào lại chọn áo
@@ -445,6 +516,58 @@ def send_payment_message_on_save(sender, instance, created, **kwargs):
     bot.send_message(chat_id=chat_group_id, text=text)
 
 
+
+
+@receiver(post_save, sender=ClotheService)
+def update_total_clothe(sender, instance, created, **kwargs):
+            cart = instance.cart
+            cart.total_clothe  = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+            cart.str_total_clothe= '{:,.0f}'.format(cart.total_clothe)
+            cart.discount_clothe =  ClotheService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
+            cart.deposit_clothe = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
+            cart.save()
+   
+@receiver(post_save, sender=PhotoService)
+def update_total_photo(sender, instance, created, **kwargs):
+            cart = instance.cart
+            cart.total_photo = PhotoService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+            cart.str_total_photo= '{:,.0f}'.format(cart.total_photo)
+            cart.discount_photo =  PhotoService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
+            cart.deposit_photo = PhotoService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
+            cart.save()
+
+@receiver(post_save, sender=MakeupService)
+def update_total_makup(sender, instance, created, **kwargs):
+            cart = instance.cart
+            cart.total_makup = MakeupService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+            cart.str_total_makup= '{:,.0f}'.format(cart.total_makup)
+            cart.discount_makup =  MakeupService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
+            cart.deposit_makup = MakeupService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
+            cart.save()
+    
+@receiver(post_save, sender=AccessorysSerive)
+def update_total_accessorys(sender, instance, created, **kwargs):
+            cart = instance.cart
+            cart.total_accessory = AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+            cart.total_accessory_hr = AccessorysSerive.objects.filter(cart=cart,product__is_hr = True).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+            cart.str_total_accessory= '{:,.0f}'.format(cart.total_accessory)
+            cart.discount_accessory =  AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
+            cart.deposit_accessory = AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
+            cart.save()    
+
+@receiver(post_save, sender=IncurredCart)
+def update_total_incurred(sender, instance, created, **kwargs):
+    cart = instance.cart
+    cart.total_incurred_raw =IncurredCart.objects.filter(cart=cart).aggregate(models.Sum('amount'))['amount__sum'] or 0 
+    cart.save()
+ 
+@receiver(post_save, sender=PaymentScheduleCart)
+def update_total_payment(sender, instance, created, **kwargs):
+    cart = instance.cart
+    cart.total_payment_raw =PaymentScheduleCart.objects.filter(cart=cart).aggregate(models.Sum('amount'))['amount__sum'] or 0 
+    cart.save()   
+
+  
 def save_clothe():
     clothe = ClotheService.objects.all()
     for self in clothe:
@@ -472,18 +595,6 @@ def save_clothe():
         if self.return_date == None:
             self.return_date = max_wedding_date + timedelta(days=2) 
         self.total_deposit = self.clothe.deposit* self.qty
-        today = date.today()
-        if today < self.delivery_date:
-            status = "Chờ cho thuê"
-        elif today >= self.delivery_date and self.returned_at is None:
-            if today <= self.return_date:
-                status = "Đang cho thuê"
-            elif today > self.return_date:
-                num_date = today - self.return_date
-                status = f"QUÁ HẠN THUÊ {num_date.days} NGÀY"
-            else:
-                status = "Đã thu hồi"
-        self.item_status = status
         self.save()
 
 def save_photo():
@@ -559,18 +670,6 @@ def save_acc():
             self.delivery_date = min_wedding_date - timedelta(days=2)
         if self.return_date == None:
             self.return_date = max_wedding_date + timedelta(days=2) 
-        today = date.today()
-        if today < self.delivery_date:
-            status = "Chờ cho thuê"
-        elif today >= self.delivery_date and self.returned_at is None:
-            if today <= self.return_date:
-                status = "Đang cho thuê"
-            elif today > self.return_date:
-                num_date = today - self.return_date
-                status = f"QUÁ HẠN THUÊ {num_date.days} NGÀY"
-        else:
-            status = "Đã thu hồi"
-        self.item_status = status
         total_deposit = self.product.deposit*self.qty
         if total_deposit is None:
             self.total_deposit=0
@@ -603,53 +702,35 @@ def save_car():
         cart.save()
 
 
-@receiver(post_save, sender=ClotheService)
-def update_total_clothe(sender, instance, created, **kwargs):
-            cart = instance.cart
-            cart.total_clothe  = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
-            cart.str_total_clothe= '{:,.0f}'.format(cart.total_clothe)
-            cart.discount_clothe =  ClotheService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
-            cart.deposit_clothe = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
-            cart.save()
-   
-@receiver(post_save, sender=PhotoService)
-def update_total_photo(sender, instance, created, **kwargs):
-            cart = instance.cart
-            cart.total_photo = PhotoService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
-            cart.str_total_photo= '{:,.0f}'.format(cart.total_photo)
-            cart.discount_photo =  PhotoService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
-            cart.deposit_photo = PhotoService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
-            cart.save()
-
-@receiver(post_save, sender=MakeupService)
-def update_total_makup(sender, instance, created, **kwargs):
-            cart = instance.cart
-            cart.total_makup = MakeupService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
-            cart.str_total_makup= '{:,.0f}'.format(cart.total_makup)
-            cart.discount_makup =  MakeupService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
-            cart.deposit_makup = MakeupService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
-            cart.save()
-    
-@receiver(post_save, sender=AccessorysSerive)
-def update_total_accessorys(sender, instance, created, **kwargs):
-            cart = instance.cart
-            cart.total_accessory = AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
-            cart.total_accessory_hr = AccessorysSerive.objects.filter(cart=cart,product__is_hr = True).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
-            cart.str_total_accessory= '{:,.0f}'.format(cart.total_accessory)
-            cart.discount_accessory =  AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
-            cart.deposit_accessory = AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
-            cart.save()    
-
-@receiver(post_save, sender=IncurredCart)
-def update_total_incurred(sender, instance, created, **kwargs):
-    cart = instance.cart
-    cart.total_incurred_raw =IncurredCart.objects.filter(cart=cart).aggregate(models.Sum('amount'))['amount__sum'] or 0 
-    cart.save()
- 
-@receiver(post_save, sender=PaymentScheduleCart)
-def update_total_payment(sender, instance, created, **kwargs):
-    cart = instance.cart
-    cart.total_payment_raw =PaymentScheduleCart.objects.filter(cart=cart).aggregate(models.Sum('amount'))['amount__sum'] or 0 
-    cart.save()   
-
-  
+def save_clothe_info_rent ():
+    clothes = ClotheService.objects.all()
+    for instance in clothes:
+            delivery_start_date = instance.delivery_date 
+            return_end_date = instance.return_date 
+            inital_qty = instance.clothe.qty
+            rental_dates = []
+            current_date = delivery_start_date
+            while current_date <= return_end_date:
+                rental_dates.append(current_date)
+                current_date += timedelta(days=1)
+            existing_rental_info = ClotheRentalInfo.objects.filter(clothe=instance.clothe, rental_date__in=rental_dates)
+            existing_rental_info.delete()
+            # Lấy previous_clothe_id
+            previous_clothe_id = instance.previous_clothe_id
+            for date in rental_dates:
+                # Tính toán tổng số lượng cho mỗi ngày thuê cho Clothe
+                total_rental_qty = ClotheService.objects.filter(
+                    clothe = instance.clothe,  # Sử dụng previous_clothe_id
+                    delivery_date__lte=date,
+                    return_date__gte=date
+                ).aggregate(total_qty=Sum('qty'))['total_qty'] or 0
+                avai_qty = max(inital_qty - total_rental_qty, 0)
+                # Tạo hoặc cập nhật thông tin thuê cho Clothe mới
+                ClotheRentalInfo.objects.create(
+                    clothe=instance.clothe,
+                    rental_date=date,
+                    qty = total_rental_qty,
+                    available_qty = avai_qty)
+            instance.save()    
+                    
+                    

@@ -11,45 +11,43 @@ from django.db.models import Q
 from members.models import Member
 from dateutil.relativedelta import relativedelta
 from services_admin.function import *
+from django.db.models import F, ExpressionWrapper, OuterRef, IntegerField, Subquery
 
 
+
+def calculate_total_rentals_by_date(clothe,target_date):
+    total_rentals = ClotheRentalInfo.objects.filter(rental_date=target_date).aggregate(total_clothes=Sum('qty'))['total_clothes'] or 0
+    return total_rentals
 
 class ClotheServiceInline(admin.StackedInline):
     form = ClotheServiceForm
     model= ClotheService
-    fields = ['clothe','qty','is_discount','delivery_date','return_date','str_total_items','total_deposit_str']
-    readonly_fields = ['str_total_items','total_deposit_str']
-    from datetime import timedelta
-
+    fields = ['clothe','qty','is_discount','delivery_date','return_date','str_total_items',]
+    readonly_fields = ['str_total_items',]
+    
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "clothe":
-            cart_id = request.resolver_match.kwargs.get('object_id')
-            clothe = Clothe.objects.filter(is_available=True)
+        if db_field.name == 'clothe':
+            cart_id = request.resolver_match.kwargs.get('object_id') 
             if cart_id:
                 cart = Cart.objects.get(pk=cart_id)
-                selected_clothes = Clothe.objects.filter(clotheservice__cart=cart) 
+                # Tạo khoảng thời gian +/- 2 ngày từ wedding_date
                 wed1 = cart.wedding_date
                 wed2 = cart.wedding_date_2
                 INFINITY_DATE = date.max
                 MINUS_INFINITY_DATE = date.min
                 max_wedding = max(wed1 or MINUS_INFINITY_DATE, wed2 or MINUS_INFINITY_DATE)
                 min_wedding = min(wed1 or INFINITY_DATE, wed2 or INFINITY_DATE)
-                delivery = min_wedding - timedelta(days=2)
-                receive = max_wedding + timedelta(days=2) 
-                check_date = [delivery, min_wedding, max_wedding, receive]
-                # Tạo một danh sách các pk của các Clothe có sẵn và đáp ứng điều kiện
-                available_clothe_pks = [
-                    item.pk for item in clothe 
-                    if all(available_qty_clothe_view(item.pk, date) > 0 for date in check_date)
-                ]
-                # Tạo queryset kết hợp giữa selected_clothes và clothe
-                combined_queryset = (selected_clothes | clothe.filter(pk__in=available_clothe_pks)).distinct()
-                kwargs["queryset"] = combined_queryset
+                start_date = min_wedding - timedelta(days=2)
+                end_date = max_wedding + timedelta(days=2) 
+                exclude_clothe = ClotheRentalInfo.objects.filter(rental_date__range=(start_date, end_date), available_qty=0)
+                exclude_clothe_ids = list(set(exclude_clothe.values_list('clothe_id', flat=True)))
+                available_clothe = Clothe.objects.exclude(id__in=exclude_clothe_ids)
+                selected_clothes = Clothe.objects.filter(clotheservice__cart=cart)
+                queryset = available_clothe | selected_clothes
+                kwargs["queryset"] = queryset
             else:
-                kwargs["queryset"] = Clothe.objects.none()
-
+                    kwargs["queryset"] = Clothe.objects.none()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
 
 
     
@@ -130,6 +128,8 @@ class WeddingDateFilter(admin.SimpleListFilter):
             if start_date and end_date:
                 return queryset.filter(cart__wedding_date__range=(start_date, end_date))
         return queryset
+
+
 
 
 
@@ -225,20 +225,24 @@ class PaymentCartInline(admin.StackedInline):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','image_tag','user','client','created_at', 'str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable','str_total_deposit', 'wedding_date','wedding_date_2')
-    fields = ['client','wedding_date','wedding_date_2','note','str_total_cart', 'str_total_discount','str_total_incurred', 'str_total','str_total_payment', 'str_receivable','str_total_deposit']
+    list_display=('id','image_tag','user','client','created_at', 'str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable', 'wedding_date','wedding_date_2')
+    fields = ['user','user_modified','client','wedding_date','wedding_date_2','note','str_total_cart', 'str_total_discount','str_total_incurred', 'str_total','str_total_payment', 'str_receivable',]
     list_display_links=('client',)
     search_fields=('client__phone',)
      #['created_at','wedding_date',]
-    readonly_fields = [ 'created_at','str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable','str_total_deposit']
+    readonly_fields = [ 'user','user_modified','created_at','str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable',]
     list_filter = ('created_at','user__username', 'client__full_name')
     inlines = [PaymentCartInline,ClotheServiceInline,PhotoServiceInline, MakeupServiceInline, AccessoryServiceInline,IncurredCartInline,PhotoScheduleInline]
     
-
     def save_model(self, request, obj, form, change):
-        # Override phương thức save_model để tự động lưu trường user là người dùng đang đăng nhập
-        obj.user = request.user
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
         obj.save()
+
+    
 
     def image_tag(self, obj):
         member = Member.objects.filter(id_member_id =obj.user_id).first()
@@ -256,3 +260,5 @@ admin.site.register(Cart,CartAdmin )
 admin.site.register(ReturnClothe, ReturnClotheAdmin)
 admin.site.register(ReturnAccessory,ReturnAccessoryAdmin)
 
+# Sử dụng ClotheAvailabilityAdmin trong Django Admin
+# admin.site.register(ClotheAvailability, ClotheAvailabilityAdmin)
