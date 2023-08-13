@@ -15,6 +15,8 @@ from django.db.models.signals import post_save, post_delete,pre_save
 from telegram import Bot
 from infobot import *
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 
 
@@ -131,11 +133,18 @@ class ClotheService(CartItems):
     previous_clothe_id = models.PositiveIntegerField(null=True, blank=True)
     previous_clothe_qty = models.PositiveIntegerField(default=0,null=True, blank=True)
    
+    def clean(self):
+        existing_service = ClotheService.objects.filter(cart=self.cart, clothe=self.clothe).exclude(pk=self.pk)
+        if existing_service.exists():
+            raise ValidationError(_("Bạn chỉ được chọn 1 mã áo cho 1 Cart"))
 
     class Meta:
         verbose_name = 'Cho thuê đồ cưới'
         verbose_name_plural = 'Cho thuê đồ cưới'
-    
+    class Meta:
+        # Đảm bảo rằng trong cùng một cart, chỉ có một clothe có id duy nhất được tạo
+        unique_together = ('cart', 'clothe')
+        
     def __str__(self):
         return str(self.clothe)
     

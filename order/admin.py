@@ -43,7 +43,7 @@ class ClotheServiceInline(admin.StackedInline):
                 exclude_clothe_ids = list(set(exclude_clothe.values_list('clothe_id', flat=True)))
                 available_clothe = Clothe.objects.exclude(id__in=exclude_clothe_ids)
                 selected_clothes = Clothe.objects.filter(clotheservice__cart=cart)
-                queryset = available_clothe | selected_clothes
+                queryset =(available_clothe | selected_clothes).distinct()
                 kwargs["queryset"] = queryset
             else:
                     kwargs["queryset"] = Clothe.objects.none()
