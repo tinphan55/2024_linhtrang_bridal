@@ -410,6 +410,12 @@ class ClotheRentalInfo(models.Model):
 @receiver([post_save, post_delete], sender=ClotheService)
 def update_clothe_rental_info(sender, instance, **kwargs):
     created = kwargs.get('created', False)
+    cart = instance.cart
+    cart.total_clothe  = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+    cart.str_total_clothe= '{:,.0f}'.format(cart.total_clothe)
+    cart.discount_clothe =  ClotheService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
+    cart.deposit_clothe = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
+    cart.save()
     if instance.clothe.is_available:  # Chỉ xử lý nếu Clothe có sẵn
         delivery_start_date = instance.delivery_date 
         return_end_date = instance.return_date 
@@ -517,17 +523,17 @@ def send_payment_message_on_save(sender, instance, created, **kwargs):
 
 
 
-@receiver(post_save, sender=ClotheService)
-def update_total_clothe(sender, instance, created, **kwargs):
-            cart = instance.cart
-            cart.total_clothe  = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
-            cart.str_total_clothe= '{:,.0f}'.format(cart.total_clothe)
-            cart.discount_clothe =  ClotheService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
-            cart.deposit_clothe = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
-            cart.save()
-   
-@receiver(post_save, sender=PhotoService)
-def update_total_photo(sender, instance, created, **kwargs):
+# @receiver(post_save, sender=ClotheService)
+# def update_total_clothe(sender, instance, created, **kwargs):
+#             cart = instance.cart
+#             cart.total_clothe  = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
+#             cart.str_total_clothe= '{:,.0f}'.format(cart.total_clothe)
+#             cart.discount_clothe =  ClotheService.objects.filter(cart=cart).aggregate(models.Sum('discount'))['discount__sum'] or 0
+#             cart.deposit_clothe = ClotheService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
+#             cart.save()
+@receiver([post_save, post_delete],  sender=PhotoService)  
+def update_total_photo(sender, instance, **kwargs):
+            created = kwargs.get('created', False)
             cart = instance.cart
             cart.total_photo = PhotoService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
             cart.str_total_photo= '{:,.0f}'.format(cart.total_photo)
@@ -535,8 +541,9 @@ def update_total_photo(sender, instance, created, **kwargs):
             cart.deposit_photo = PhotoService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
             cart.save()
 
-@receiver(post_save, sender=MakeupService)
-def update_total_makup(sender, instance, created, **kwargs):
+@receiver([post_save, post_delete], sender=MakeupService)
+def update_total_makup(sender, instance,  **kwargs):
+            created = kwargs.get('created', False)
             cart = instance.cart
             cart.total_makup = MakeupService.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
             cart.str_total_makup= '{:,.0f}'.format(cart.total_makup)
@@ -544,8 +551,9 @@ def update_total_makup(sender, instance, created, **kwargs):
             cart.deposit_makup = MakeupService.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
             cart.save()
     
-@receiver(post_save, sender=AccessorysSerive)
-def update_total_accessorys(sender, instance, created, **kwargs):
+@receiver([post_save, post_delete],  sender=AccessorysSerive)
+def update_total_accessorys(sender, instance,**kwargs):
+            created = kwargs.get('created', False)
             cart = instance.cart
             cart.total_accessory = AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
             cart.total_accessory_hr = AccessorysSerive.objects.filter(cart=cart,product__is_hr = True).aggregate(models.Sum('total_items'))['total_items__sum'] or 0
@@ -554,14 +562,16 @@ def update_total_accessorys(sender, instance, created, **kwargs):
             cart.deposit_accessory = AccessorysSerive.objects.filter(cart=cart).aggregate(models.Sum('total_deposit'))['total_deposit__sum'] or 0
             cart.save()    
 
-@receiver(post_save, sender=IncurredCart)
-def update_total_incurred(sender, instance, created, **kwargs):
+@receiver([post_save, post_delete],  sender=IncurredCart)
+def update_total_incurred(sender, instance, **kwargs):
+    created = kwargs.get('created', False)
     cart = instance.cart
     cart.total_incurred_raw =IncurredCart.objects.filter(cart=cart).aggregate(models.Sum('amount'))['amount__sum'] or 0 
     cart.save()
  
-@receiver(post_save, sender=PaymentScheduleCart)
-def update_total_payment(sender, instance, created, **kwargs):
+@receiver([post_save, post_delete],  sender=PaymentScheduleCart)
+def update_total_payment(sender, instance,  **kwargs):
+    created = kwargs.get('created', False)
     cart = instance.cart
     cart.total_payment_raw =PaymentScheduleCart.objects.filter(cart=cart).aggregate(models.Sum('amount'))['amount__sum'] or 0 
     cart.save()   
