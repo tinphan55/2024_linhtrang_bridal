@@ -44,7 +44,7 @@ class Client (models.Model):
     def __str__(self):
         return str(self.full_name) + '_' + str(self.code)
     
-    # def save(self, *args, **kwargs):
-    #     self.address = str(self.ward)+ str(', ')+ str(self.ward.district) + str(', ')+ str(self.ward.district.province)
-    #     super(Client , self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.address = str(self.ward)+ str(', ')+ str(self.ward.district) + str(', ')+ str(self.ward.district.province)
+        super(Client , self).save(*args, **kwargs)
 
