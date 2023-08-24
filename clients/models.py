@@ -45,6 +45,7 @@ class Client (models.Model):
         return str(self.full_name) + '_' + str(self.code)
     
     def save(self, *args, **kwargs):
-        self.address = str(self.ward)+ str(', ')+ str(self.ward.district) + str(', ')+ str(self.ward.district.province)
+        if self.ward:
+            self.address = str(self.ward)+ str(', ')+ str(self.ward.district) + str(', ')+ str(self.ward.district.province)
         super(Client , self).save(*args, **kwargs)
 

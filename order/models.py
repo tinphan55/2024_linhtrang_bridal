@@ -132,18 +132,20 @@ class ClotheService(CartItems):
     # item_status  = models.CharField(max_length=50,null= True, blank=True, verbose_name="Trạng thái")
     previous_clothe_id = models.PositiveIntegerField(null=True, blank=True)
     previous_clothe_qty = models.PositiveIntegerField(default=0,null=True, blank=True)
-   
+    
+    class Meta:
+        # Đảm bảo rằng trong cùng một cart, chỉ có một clothe có id duy nhất được tạo
+        unique_together = ('cart', 'clothe')
+        verbose_name = 'Cho thuê đồ cưới'
+        verbose_name_plural = 'Cho thuê đồ cưới'
+        
     def clean(self):
         existing_service = ClotheService.objects.filter(cart=self.cart, clothe=self.clothe).exclude(pk=self.pk)
         if existing_service.exists():
             raise ValidationError(_("Bạn chỉ được chọn 1 mã áo cho 1 Cart"))
 
-    class Meta:
-        verbose_name = 'Cho thuê đồ cưới'
-        verbose_name_plural = 'Cho thuê đồ cưới'
-    class Meta:
-        # Đảm bảo rằng trong cùng một cart, chỉ có một clothe có id duy nhất được tạo
-        unique_together = ('cart', 'clothe')
+    
+    
         
     def __str__(self):
         return str(self.clothe)
