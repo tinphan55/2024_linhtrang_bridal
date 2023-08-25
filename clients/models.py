@@ -26,7 +26,7 @@ class Ward(models.Model):
 class Client (models.Model):
     full_name = models.CharField(max_length= 50, verbose_name='Tên đầy đủ')
     code = models.CharField(max_length= 50, verbose_name='Mã KH')
-    phone = models.IntegerField(null=False, verbose_name='Điện thoại')
+    phone = models.IntegerField(null=False, verbose_name='Điện thoại', unique=True)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name='Ngày tạo')
     last_order_date = models.DateTimeField(auto_now=True)
     address = models.CharField(max_length=100, null= True, blank = True, verbose_name='Địa chỉ')
@@ -49,3 +49,14 @@ class Client (models.Model):
             self.address = str(self.ward)+ str(', ')+ str(self.ward.district) + str(', ')+ str(self.ward.district.province)
         super(Client , self).save(*args, **kwargs)
 
+def update_ward_for_empty_records():
+    clients_with_empty_ward = Client.objects.filter(ward__isnull=True, address__isnull=False)
+    
+    for client in clients_with_empty_ward:
+        address = client.address
+        matching_wards = Ward.objects.filter(name__icontains=address)
+        
+        if matching_wards.exists():
+            ward = matching_wards.first()
+            client.ward = ward
+            client.save(update_fields=['ward'])
