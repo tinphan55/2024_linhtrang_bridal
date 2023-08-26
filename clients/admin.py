@@ -10,7 +10,7 @@ from order.models import *
 
 class ClientAdmin (admin.ModelAdmin):
     model = Client
-    list_display=('full_name', 'code', 'phone','address','str_total_values')
+    list_display=('full_name','created_date', 'code', 'phone','address','str_total_values')
     field =['full_name', 'code', 'phone','ward','birthday','note','str_total_values']
     search_fields = ('full_name', 'code', 'phone')
     readonly_fields= ['address','str_total_values']
