@@ -183,4 +183,8 @@ JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
 # Ví dụ cấu hình cho việc sao lưu vào thư mục 'backups/'
 DBBACKUP_STORAGE = 'dbbackup.storage.filesystem_storage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/myproject/backups/'}
+DBBACKUP_STORAGE = 'dbbackup.storage.dropbox_storage'
+DBBACKUP_STORAGE_OPTIONS = {
+    'oauth2_token': 'sl.BpddtgI_3NA82t4nTUn9s9lqSa2uW7D1M-zZu4SzrO81ErGIqQSFU6jQYffw85qb49mehWspOkGi3xwuHRiJLrU8HkDej3jjvbeMdLx_iEuNhWBVqxWpf4wzk09zUS7ND6CSH5_-UHDS',
+    'path': '/Linh Trang Bridal/Backup', # Đường dẫn để lưu trữ sao lưu trong Dropbox
+}
