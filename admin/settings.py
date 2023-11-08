@@ -183,4 +183,9 @@ JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
 # Ví dụ cấu hình cho việc sao lưu vào thư mục 'backups/'
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/root/myproject/backup/'}
+DBBACKUP_CLEANUP_KEEP = True
+DBBACKUP_CLEANUP_KEEP_NUMBER = 3  # Số lượng bản sao lưu giữ lại
+DBBACKUP_STORAGE_OPTIONS = {
+    'clean_name': 'mybackup_{datetime}.{extension}',
+    'location': '/root/myproject/backup/',
+}
