@@ -183,4 +183,4 @@ JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
 # Ví dụ cấu hình cho việc sao lưu vào thư mục 'backups/'
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/bridal/backup/dir/'}
+DBBACKUP_STORAGE_OPTIONS = {'location': 'root/myproject/backup/'}
