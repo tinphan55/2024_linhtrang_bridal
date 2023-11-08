@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from .jazzmin import *
 from datetime import timedelta
-from datetime import datetime
+import datetime
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -191,8 +191,8 @@ DBBACKUP_STORAGE_OPTIONS = {
     'location': '/root/myproject/backup/',
 }
 
-def custom_backup_filename(databasename, servername, datetime, extension, content_type):
-    current_datetime = datetime.now().strftime('%Y-%m-%d')
+def custom_backup_filename(databasename, servername, extension, content_type):
+    current_datetime = datetime.datetime.now().strftime('%Y-%m-%d')
     return f"{current_datetime}.{extension}"
 
 DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
