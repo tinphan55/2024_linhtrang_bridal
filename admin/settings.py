@@ -188,7 +188,13 @@ DBBACKUP_CLEANUP_KEEP_NUMBER = 3  # Số lượng bản sao lưu giữ lại
 DBBACKUP_STORAGE_OPTIONS = {
     'location': '/root/myproject/backup/',
 }
-def backup_filename(databasename, servername, datetime, extension, content_type):
-    pass
+from datetime import datetime
+
+def custom_backup_filename(databasename, servername, datetime, extension, content_type):
+    current_datetime = datetime.now().strftime('%Y-%m-%d-%H%M%S')
+    return f"{servername}-{current_datetime}.{extension}"
+
+DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
+
 
 DBBACKUP_FILENAME_TEMPLATE = backup_filename
