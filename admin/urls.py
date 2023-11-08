@@ -24,7 +24,8 @@ urlpatterns = [
     path('', include('event_calendar.urls')),
     path('', include('frontend.urls')),
     path('', include('bills.urls')),
-    path('', include('members.urls'))
+    path('', include('members.urls')),
+    # path('', include('clients.urls'))
 
     
 ] 
