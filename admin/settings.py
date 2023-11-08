@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from .jazzmin import *
 from datetime import timedelta
+from datetime import datetime
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -188,7 +190,6 @@ DBBACKUP_CLEANUP_KEEP_NUMBER = 3  # Số lượng bản sao lưu giữ lại
 DBBACKUP_STORAGE_OPTIONS = {
     'location': '/root/myproject/backup/',
 }
-from datetime import datetime
 
 def custom_backup_filename(databasename, servername, datetime, extension, content_type):
     current_datetime = datetime.now().strftime('%Y-%m-%d-%H%M%S')
@@ -197,4 +198,3 @@ def custom_backup_filename(databasename, servername, datetime, extension, conten
 DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
 
 
-DBBACKUP_FILENAME_TEMPLATE = backup_filename
