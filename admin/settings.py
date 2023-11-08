@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'frontend',
     'bills', 
     'report',
+    # 'iwedding',
+    'dbbackup',
   
   
 ]
@@ -115,6 +117,16 @@ DATABASES_LIST = [{
         'HOST': '',
         'PORT': '5432',
     }
+},
+{
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'main_backup_bridal',                      
+        'USER': 'postgres',
+        'PASSWORD': 'Ecotr@ding2021',
+        'HOST': '',
+        'PORT': '5432',
+    }
 }]
 DATABASES = DATABASES_LIST[0]
 # Password validation
@@ -169,3 +181,6 @@ MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
+# Ví dụ cấu hình cho việc sao lưu vào thư mục 'backups/'
+DBBACKUP_STORAGE = 'dbbackup.storage.filesystem_storage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/myproject/backups/'}
