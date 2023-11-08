@@ -191,9 +191,8 @@ DBBACKUP_STORAGE_OPTIONS = {
     'location': '/root/myproject/backup/',
 }
 
-def custom_backup_filename(databasename, servername, extension, content_type):
-    current_datetime = datetime.datetime.now().strftime('%Y-%m-%d')
-    return f"{current_datetime}.{extension}"
+def custom_backup_filename(databasename, servername, extension,datetime, content_type):
+    return f"{datetime}.{extension}"
 
 DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
 
