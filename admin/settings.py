@@ -197,4 +197,7 @@ def custom_backup_filename(databasename, servername, extension,datetime, content
 
 DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
 
+CRONJOBS = [
+    ('00 0 1,15 * *', 'admin.backup.backup_and_upload_to_dropbox'), # Chạy vào ngày 1 và 15 hàng tháng
+]
 
