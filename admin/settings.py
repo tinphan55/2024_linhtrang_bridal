@@ -192,8 +192,8 @@ DBBACKUP_STORAGE_OPTIONS = {
 }
 
 def custom_backup_filename(databasename, servername, datetime, extension, content_type):
-    current_datetime = datetime.now().strftime('%Y-%m-%d-%H%M%S')
-    return f"{servername}-{current_datetime}.{extension}"
+    current_datetime = datetime.now().strftime('%Y-%m-%d')
+    return f"{current_datetime}.{extension}"
 
 DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
 
