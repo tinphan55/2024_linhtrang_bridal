@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'report',
     # 'iwedding',
     'dbbackup',
+    'django_crontab',
+    
   
   
 ]
