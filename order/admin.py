@@ -25,6 +25,13 @@ class ClotheServiceInline(admin.StackedInline):
     fields = ['clothe','qty','is_discount','delivery_date','return_date','str_total_items',]
     readonly_fields = ['str_total_items',]
     
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'clothe':
             cart_id = request.resolver_match.kwargs.get('object_id') 
@@ -177,6 +184,13 @@ class PhotoScheduleInline(admin.StackedInline):
     model =  Event 
     extra = 1
     fields = ['title','start_time','end_time','description']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
     
    
 
@@ -186,6 +200,13 @@ class MakeupServiceInline(admin.StackedInline):
     #raw_id_fields = ['product']
     readonly_fields = ['str_total_items','total_deposit_str']
     extra = 1
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
  
 
     
@@ -195,7 +216,13 @@ class AccessoryServiceInline(admin.StackedInline):
     fields = ['product','qty','is_discount','str_total_items', 'delivery_date', 'return_date','total_deposit_str']
     #raw_id_fields = ['product']
     readonly_fields = ['str_total_items','total_deposit_str']
-    
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
 
 
 class PhotoServiceInline(admin.StackedInline):
@@ -203,7 +230,13 @@ class PhotoServiceInline(admin.StackedInline):
     fields = ['package','is_discount','note','str_total_items','total_deposit_str']
     readonly_fields = ['str_total_items', 'total_deposit_str']
     extra = 1
-   
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
     
 
 
@@ -212,11 +245,25 @@ class IncurredCartInline(admin.StackedInline):
     model = IncurredCart 
     extra = 1 
     fields = ['amount','description','created_at']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
 
 class PaymentCartInline(admin.StackedInline):
     model = PaymentScheduleCart
     extra = 3 
     fields = ['amount','description','created_at']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
    
         
 
