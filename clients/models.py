@@ -25,7 +25,7 @@ class Ward(models.Model):
 
 class Client (models.Model):
     full_name = models.CharField(max_length= 50, verbose_name='Tên đầy đủ')
-    code = models.CharField(max_length= 50,unique=True, verbose_name='Mã KH')
+    code = models.CharField(max_length= 50,unique=False, verbose_name='Mã KH')
     phone = models.IntegerField(null=False, verbose_name='Điện thoại', unique=True)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name='Ngày tạo')
     last_order_date = models.DateTimeField(auto_now=True)
