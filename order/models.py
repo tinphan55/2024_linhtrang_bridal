@@ -107,6 +107,8 @@ class CartItems(models.Model):
         abstract = True
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)  
     created_at = models.DateTimeField(default=datetime.now)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True, blank= True, 
+                             verbose_name="Người tạo")
     price = models.FloatField(blank=True, default=0, verbose_name="Giá")
     qty = models.IntegerField(default=1, verbose_name="Số lượng")
     discount = models.IntegerField(null= True, blank=True, default=0,verbose_name= "Giảm giá")
@@ -351,6 +353,8 @@ class IncurredCart(models.Model):
     description = models.TextField(max_length=500, null=False, verbose_name="Mô tả")
     created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
     amount =  models.IntegerField(null= False, default=0, verbose_name="Số tiền")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True, blank= True, 
+                             verbose_name="Người tạo")
     class Meta:
         verbose_name = 'Tiền phát sinh'
         verbose_name_plural = 'Tiền phát sinh'
@@ -363,6 +367,8 @@ class PaymentScheduleCart(models.Model):
     amount =  models.IntegerField(null= False, default=0, verbose_name="Số tiền")
     description = models.TextField(max_length=500, verbose_name='Mô tả')
     created_at = models.DateTimeField(default=datetime.now, verbose_name="Ngày tạo")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True, blank= True, 
+                             verbose_name="Người tạo")
     class Meta:
         verbose_name = 'Khách trả tiền'
         verbose_name_plural = 'Khách trả tiền'
