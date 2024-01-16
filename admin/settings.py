@@ -131,6 +131,16 @@ DATABASES_LIST = [{
         'HOST': '',
         'PORT': '5432',
     }
+},
+{
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'bridal',                      
+        'USER': 'postgres',
+        'PASSWORD': 'Ecotrading2024',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }]
 DATABASES = DATABASES_LIST[0]
 # Password validation
@@ -155,7 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'vi'
 
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
