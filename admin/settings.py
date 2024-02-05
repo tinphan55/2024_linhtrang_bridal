@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from .jazzmin import *
 from datetime import timedelta
+from dotenv import load_dotenv
+
+# Load environment variables from file
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +31,7 @@ SECRET_KEY = 'django-insecure-+nlr26ab3&*j8fg=q8hr&k0nkl=12s7=cb%g3ur34&o!k7i@lj
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+CSRF_TRUSTED_ORIGINS = ['https://linhtrangbridal.shop']
 
 
 
@@ -94,29 +100,22 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES_LIST = [{
-#server
-      'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': 'bridal',                      
-         'USER': 'huytruong',
-         'PASSWORD': 'Linhtr@ng2023',
-         'HOST': 'localhost',
-         'PORT': '',
-     }
- }, 
-#localhost
-{
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Bridal_develop',                      
-        'USER': 'postgres',
-        'PASSWORD': 'Ecotr@ding2021',
-        'HOST': '',
-        'PORT': '5432',
-    }
-}]
+
+DATABASES_LIST = [
+    {
+        'default': {
+            'ENGINE': os.getenv('DB_ENGINE'),
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
+
+    },
+]
 DATABASES = DATABASES_LIST[0]
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
