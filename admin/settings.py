@@ -16,6 +16,8 @@ from datetime import timedelta
 from datetime import datetime as dt
 from dotenv import load_dotenv
 
+import os
+
 # Load environment variables from file
 load_dotenv()
 
