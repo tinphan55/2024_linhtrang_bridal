@@ -13,3 +13,7 @@ class Report(models.Model):
     def url_link(self):
        return format_html('<a href="%s" target="_blank">%s</a>' % (self.url, "Xem báo cáo"))
     url_link.short_description = 'URL' # tên cột trong Django admin
+
+    class Meta:
+        verbose_name = 'Báo cáo'
+        verbose_name_plural = 'Báo cáo'

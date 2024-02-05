@@ -11,57 +11,53 @@ from django.db.models import Q
 from members.models import Member
 from dateutil.relativedelta import relativedelta
 from services_admin.function import *
+from django.db.models import F, ExpressionWrapper, OuterRef, IntegerField, Subquery
 
 
+
+def calculate_total_rentals_by_date(clothe,target_date):
+    total_rentals = ClotheRentalInfo.objects.filter(rental_date=target_date).aggregate(total_clothes=Sum('qty'))['total_clothes'] or 0
+    return total_rentals
 
 class ClotheServiceInline(admin.StackedInline):
     form = ClotheServiceForm
     model= ClotheService
-    fields = ['clothe','qty','is_discount','delivery_date','return_date','total_items_','total_deposit_str']
-    readonly_fields = ['total_items_','total_deposit_str']
-    from datetime import timedelta
-
+    fields = ['clothe','qty','is_discount','delivery_date','return_date','str_total_items',]
+    readonly_fields = ['str_total_items',]
+    
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "clothe":
-            cart_id = request.resolver_match.kwargs.get('object_id')
-            clothe = Clothe.objects.filter(is_available=True)
+        if db_field.name == 'clothe':
+            cart_id = request.resolver_match.kwargs.get('object_id') 
             if cart_id:
                 cart = Cart.objects.get(pk=cart_id)
-                selected_clothes = Clothe.objects.filter(clotheservice__cart=cart) 
+                # Tạo khoảng thời gian +/- 2 ngày từ wedding_date
                 wed1 = cart.wedding_date
                 wed2 = cart.wedding_date_2
                 INFINITY_DATE = date.max
                 MINUS_INFINITY_DATE = date.min
                 max_wedding = max(wed1 or MINUS_INFINITY_DATE, wed2 or MINUS_INFINITY_DATE)
                 min_wedding = min(wed1 or INFINITY_DATE, wed2 or INFINITY_DATE)
-                delivery = min_wedding - timedelta(days=2)
-                receive = max_wedding + timedelta(days=2) 
-                check_date = [delivery, min_wedding, max_wedding, receive]
-                # Tạo một danh sách các pk của các Clothe có sẵn và đáp ứng điều kiện
-                available_clothe_pks = [
-                    item.pk for item in clothe 
-                    if all(available_qty_clothe_view(item.pk, date) > 0 for date in check_date)
-                ]
-                # Tạo queryset kết hợp giữa selected_clothes và clothe
-                combined_queryset = (selected_clothes | clothe.filter(pk__in=available_clothe_pks)).distinct()
-                kwargs["queryset"] = combined_queryset
+                start_date = min_wedding - timedelta(days=2)
+                end_date = max_wedding + timedelta(days=2) 
+                exclude_clothe = ClotheRentalInfo.objects.filter(rental_date__range=(start_date, end_date), available_qty=0)
+                exclude_clothe_ids = list(set(exclude_clothe.values_list('clothe_id', flat=True)))
+                available_clothe = Clothe.objects.exclude(id__in=exclude_clothe_ids)
+                selected_clothes = Clothe.objects.filter(clotheservice__cart=cart)
+                queryset =(available_clothe | selected_clothes).distinct()
+                kwargs["queryset"] = queryset
             else:
-                kwargs["queryset"] = Clothe.objects.none()
-
+                    kwargs["queryset"] = Clothe.objects.none()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
     
-
-        
-
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
     
 @admin.action(description='Xác nhận sản phẩm được trả')
 def confirm_returned(modeladmin, request, queryset):
@@ -142,6 +138,8 @@ class WeddingDateFilter(admin.SimpleListFilter):
 
 
 
+
+
 class ReturnClotheAdmin(admin.ModelAdmin):
     def clothe_id(self, obj):
         return obj.clothe.id
@@ -186,51 +184,59 @@ class PhotoScheduleInline(admin.StackedInline):
     model =  Event 
     extra = 1
     fields = ['title','start_time','end_time','description']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
     
    
 
 class MakeupServiceInline(admin.StackedInline):
     model =  MakeupService
-    fields = ['package','note','is_discount','total_items_','total_deposit_str']
+    fields = ['package','note','is_discount','str_total_items','total_deposit_str']
     #raw_id_fields = ['product']
-    readonly_fields = ['total_items_','total_deposit_str']
+    readonly_fields = ['str_total_items','total_deposit_str']
     extra = 1
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
+ 
+
     
 
 class AccessoryServiceInline(admin.StackedInline):
     model =  AccessorysSerive
-    fields = ['product','qty','is_discount','total_items_', 'delivery_date', 'return_date','total_deposit_str']
+    fields = ['product','qty','is_discount','str_total_items', 'delivery_date', 'return_date','total_deposit_str']
     #raw_id_fields = ['product']
-    readonly_fields = ['total_items_','total_deposit_str']
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
-    
+    readonly_fields = ['str_total_items','total_deposit_str']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
 
-    
-    
 
 class PhotoServiceInline(admin.StackedInline):
     model = PhotoService 
-    fields = ['package','is_discount','note','total_items_','total_deposit_str']
-    readonly_fields = ['total_items_', 'total_deposit_str']
+    fields = ['package','is_discount','note','str_total_items','total_deposit_str']
+    readonly_fields = ['str_total_items', 'total_deposit_str']
     extra = 1
-    @admin.display(description='Tổng tiền')
-    def total_items_(self,obj):
-        return obj.str_total_items
-    @admin.display(description='Đặt cọc')
-    def total_deposit_str(self,obj):
-        return '{:,.0f}'.format( obj.total_deposit)
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
     
 
 
@@ -239,11 +245,25 @@ class IncurredCartInline(admin.StackedInline):
     model = IncurredCart 
     extra = 1 
     fields = ['amount','description','created_at']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
 
 class PaymentCartInline(admin.StackedInline):
     model = PaymentScheduleCart
     extra = 3 
     fields = ['amount','description','created_at']
+    def save_model(self, request, obj, form, change):
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
+        obj.save()
    
         
 
@@ -252,20 +272,24 @@ class PaymentCartInline(admin.StackedInline):
 class CartAdmin(admin.ModelAdmin):
     model= Cart 
     form = CartForm
-    list_display=('id','image_tag','user','client','created_at', 'total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit', 'wedding_date','wedding_date_2')
-    fields = ['client','wedding_date','wedding_date_2','note','total_cart', 'total_discount','total_incurred', 'total','paid_', 'receivable_','total_deposit']
+    list_display=('id','image_tag','user','client','created_at', 'str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable', 'wedding_date','wedding_date_2')
+    fields = ['user','user_modified','client','wedding_date','wedding_date_2','note','str_total_cart', 'str_total_discount','str_total_incurred', 'str_total','str_total_payment', 'str_receivable',]
     list_display_links=('client',)
     search_fields=('client__phone',)
      #['created_at','wedding_date',]
-    readonly_fields = [ 'created_at','total_cart','total_discount', 'total_incurred', 'total', 'paid_','receivable_','total_deposit']
+    readonly_fields = [ 'user','user_modified','created_at','str_total_cart','str_total_discount', 'str_total_incurred', 'str_total', 'str_total_payment','str_receivable',]
     list_filter = ('created_at','user__username', 'client__full_name')
     inlines = [PaymentCartInline,ClotheServiceInline,PhotoServiceInline, MakeupServiceInline, AccessoryServiceInline,IncurredCartInline,PhotoScheduleInline]
     
-
     def save_model(self, request, obj, form, change):
-        # Override phương thức save_model để tự động lưu trường user là người dùng đang đăng nhập
-        obj.user = request.user
+        # Lưu người dùng đang đăng nhập vào trường user nếu đang tạo cart mới
+        if not change:  # Kiểm tra xem có phải là tạo mới hay không
+            obj.user = request.user
+        else:
+            obj.user_modified = request.user.username
         obj.save()
+
+    
 
     def image_tag(self, obj):
         member = Member.objects.filter(id_member_id =obj.user_id).first()
@@ -276,39 +300,12 @@ class CartAdmin(admin.ModelAdmin):
 
     image_tag.short_description = 'avatar'
 
-    @admin.display(description='Tổng trước giảm')
-    def total_cart(self, obj):
-        return '{:,.0f}'.format(obj.total_cart_raw)
-
-    @admin.display(description='Tổng phát sinh')
-    def total_incurred(self, obj):
-        return '{:,.0f}'.format(obj.total_incurred_raw)
-    @admin.display(description='Tổng giảm')
-    def total_discount (self, obj):
-        return '{:,.0f}'.format(obj.total_discount_raw)
-    
-    @admin.display(description='Tổng sau giảm')
-    def total(self, obj):
-        return '{:,.0f}'.format(obj.total_raw)
-
-    @admin.display(description='Tổng trả')
-    def paid_(self, obj):
-        return '{:,.0f}'.format(obj.total_payment_raw)
-
-    @admin.display(description='Cần thu')
-    def receivable_(self, obj):
-        return'{:,.0f}'.format(obj.receivable_raw)
-    
-    @admin.display(description='Cần đặt cọc')
-    def total_deposit(self, obj):
-        return'{:,.0f}'.format(obj.total_deposit_raw)
-
-    
-    
-
    
+
 
 admin.site.register(Cart,CartAdmin )
 admin.site.register(ReturnClothe, ReturnClotheAdmin)
 admin.site.register(ReturnAccessory,ReturnAccessoryAdmin)
 
+# Sử dụng ClotheAvailabilityAdmin trong Django Admin
+# admin.site.register(ClotheAvailability, ClotheAvailabilityAdmin)

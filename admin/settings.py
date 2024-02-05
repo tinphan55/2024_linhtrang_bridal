@@ -13,10 +13,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from .jazzmin import *
 from datetime import timedelta
+from datetime import datetime as dt
 from dotenv import load_dotenv
 
 # Load environment variables from file
 load_dotenv()
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -57,6 +59,10 @@ INSTALLED_APPS = [
     'frontend',
     'bills', 
     'report',
+    # 'iwedding',
+    'dbbackup',
+    'django_crontab',
+    
   
   
 ]
@@ -101,6 +107,7 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
+
 DATABASES_LIST = [
     {
         'default': {
@@ -114,6 +121,7 @@ DATABASES_LIST = [
 
     },
 ]
+
 DATABASES = DATABASES_LIST[0]
 
 # Password validation
@@ -138,7 +146,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'vi'
 
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
@@ -168,3 +176,21 @@ MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
+# Ví dụ cấu hình cho việc sao lưu vào thư mục 'backups/'
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_CLEANUP_KEEP = True
+DBBACKUP_CLEANUP_KEEP_NUMBER = 3  # Số lượng bản sao lưu giữ lại
+DBBACKUP_STORAGE_OPTIONS = {
+    'location': '/root/myproject/backup/',
+}
+
+def custom_backup_filename(databasename, servername, extension,datetime, content_type):
+    formatted_datetime = dt.now().strftime('%Y-%m-%d') 
+    return f"{formatted_datetime}.{extension}"
+
+DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
+
+CRONJOBS = [
+    ('00 0 1,15 * *', 'admin.backup.backup_and_upload_to_dropbox'), # Chạy vào ngày 1 và 15 hàng tháng
+]
+

@@ -5,22 +5,27 @@ from order.models import *
 
 
 
-def total_client_cart_row(obj):
-    client_items = Cart.objects.filter(client_id = obj )
-    return sum(i.total_raw for i in client_items)
 
 
 
 class ClientAdmin (admin.ModelAdmin):
     model = Client
-    list_display=('full_name', 'code', 'phone','total_cart_')
-    field =['full_name', 'code', 'phone','address','birthday','total_cart_']
+    list_display=('full_name','created_date', 'code', 'phone','address','str_total_values')
+    field =['full_name', 'code', 'phone','ward','birthday','note','str_total_values']
     search_fields = ('full_name', 'code', 'phone')
-    readonly_fields= ['total_cart_']
+    readonly_fields= ['address','str_total_values']
 
-    @admin.display(description='Tổng tiền dùng dịch vụ')
-    def total_cart_(self, obj):
-        total = total_client_cart_row(obj.id)
-        return f"{total:,}"
 
 admin.site.register(Client, ClientAdmin)
+
+@receiver([post_save, post_delete], sender=Cart)
+def total_client_cart_row(sender, instance, **kwargs):
+    items = Client.objects.get(pk =  instance.client.pk)
+    cart = Cart.objects.filter(client_id = instance.client.pk)
+    items.total_values =sum(i.total_raw  for i in cart)
+    items.str_total_values = '{:,.0f}'.format(items.total_values)
+    items.save()
+
+
+  
+

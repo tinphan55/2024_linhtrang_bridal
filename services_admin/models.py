@@ -12,8 +12,8 @@ class Category(models.Model):
     image = models.ImageField(upload_to='catagories/%Y/%m', null = True, blank=True,default = None)
 
     class Meta:
-        verbose_name = 'category'
-        verbose_name_plural = 'categories'
+        verbose_name = 'Danh mục'
+        verbose_name_plural = 'Danh mục'
 
     def __str__(self):
         return self.name
@@ -31,6 +31,9 @@ class Ranking (models.Model):
     
     def __str__(self):
         return str(self.category) +'_' + str(self.type)+ '_' +str(self.rank)
+    class Meta:
+        verbose_name = 'Xếp hạng'
+        verbose_name_plural = 'Xếp hạng'
 
 class ItemBase (models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -62,6 +65,10 @@ class Clothe(ItemBase):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     qty = models.IntegerField(null=False, default=1)
     code = models.CharField(max_length=10,null=False, blank=False, unique=True)
+
+    class Meta:
+        verbose_name = 'Quản lí Áo'
+        verbose_name_plural = 'Quản lí Áo'
     
     def __str__(self):
         return self.code
@@ -86,6 +93,10 @@ class Photo(ItemBase):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Quản lí chụp hình'
+        verbose_name_plural = 'Quản lí chụp hình'
 
     
 
@@ -95,6 +106,10 @@ class Makeup(ItemBase):
     re_makup = models.BooleanField(default=False)
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name = 'Quản lí trang điểm'
+        verbose_name_plural = 'Quản lí trang điểm'
+    
     
    
     
@@ -115,7 +130,9 @@ class Accessory(models.Model):
     deposit = models.IntegerField(default=0)
     #date_check = models.DateField(null = True, blank= True, default= datetime.now())
   
-
+    class Meta:
+        verbose_name = 'Quản lí phụ kiện'
+        verbose_name_plural = 'Quản lí phụ kiện'
     def __str__(self):
         return self.name
 
@@ -145,4 +162,8 @@ class VolatilityAccessory (models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     qty = models.IntegerField(null=False)
     description = models.TextField(max_length=500, blank=True)
+
+    class Meta:
+        verbose_name = 'Quản lí xuất nhập sản phẩm'
+        verbose_name_plural = 'Quản lí xuất nhập sản phẩm'
 
