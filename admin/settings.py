@@ -14,6 +14,7 @@ from pathlib import Path
 from .jazzmin import *
 from datetime import timedelta
 from dotenv import load_dotenv
+import os
 
 # Load environment variables from file
 load_dotenv()
