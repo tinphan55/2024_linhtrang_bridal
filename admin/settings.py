@@ -192,6 +192,8 @@ def custom_backup_filename(databasename, servername, extension,datetime, content
     return f"{formatted_datetime}.{extension}"
 
 DBBACKUP_FILENAME_TEMPLATE = custom_backup_filename
+DBBACKUP_RESTORE_OPTIONS = ['--disable-triggers']
+
 
 CRONJOBS = [
     ('00 0 1,15 * *', 'admin.backup.backup_and_upload_to_dropbox'), # Chạy vào ngày 1 và 15 hàng tháng
