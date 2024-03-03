@@ -183,7 +183,7 @@ DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_CLEANUP_KEEP = True
 DBBACKUP_CLEANUP_KEEP_NUMBER = 3  # Số lượng bản sao lưu giữ lại
 DBBACKUP_STORAGE_OPTIONS = {
-    'location': '/root/myproject/backup/',
+    'location': '/bot/linhtrang_bridal/backup/',
 }
 
 def custom_backup_filename(databasename, servername, extension,datetime, content_type):
